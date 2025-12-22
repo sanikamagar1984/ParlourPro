@@ -1,0 +1,167 @@
+/* forgot.css - Forgot Password Page */
+
+/* Use same styles as login.css with some additions */
+.auth-page {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+  padding: 20px;
+}
+
+.auth-container {
+  background: white;
+  padding: 40px;
+  border-radius: 15px;
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+  width: 100%;
+  max-width: 450px;
+}
+
+.auth-header {
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+.auth-header h2 {
+  color: #8b4513;
+  margin-bottom: 10px;
+  font-size: 28px;
+  font-weight: 600;
+  font-family: 'Georgia', serif;
+}
+
+.auth-header p {
+  color: #666;
+  font-size: 16px;
+}
+
+.help-text {
+  margin-top: 8px;
+  font-size: 13px;
+  color: #666;
+  font-style: italic;
+}
+
+.email-sent {
+  text-align: center;
+  padding: 20px 0;
+}
+
+.success-icon {
+  width: 60px;
+  height: 60px;
+  background: #2ed573;
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 30px;
+  font-weight: bold;
+  margin: 0 auto 20px;
+}
+
+.email-sent h3 {
+  color: #8b4513;
+  margin-bottom: 10px;
+}
+
+.sent-email {
+  background: #f8f9fa;
+  padding: 10px;
+  border-radius: 8px;
+  border: 1px solid #e1e5eb;
+  margin: 15px 0;
+  font-weight: 600;
+  color: #333;
+}
+
+.instructions {
+  text-align: left;
+  margin: 20px 0;
+  padding: 15px;
+  background: #f8f9fa;
+  border-radius: 10px;
+  border-left: 4px solid #8b4513;
+}
+
+.instructions p {
+  margin: 8px 0;
+  color: #666;
+  font-size: 14px;
+}
+
+.back-login {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: #8b4513;
+  padding: 10px 20px;
+  border: 2px solid #8b4513;
+  border-radius: 30px;
+  text-decoration: none;
+  font-weight: 600;
+  margin-right: 15px;
+  transition: all 0.3s ease;
+}
+
+.back-login:hover {
+  background: #8b4513;
+  color: white;
+  text-decoration: none;
+}
+
+.auth-footer {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+  padding-top: 25px;
+  border-top: 1px solid #eee;
+  margin-top: 20px;
+}
+
+/* Error and Success Messages */
+.error-message {
+  background: #fee;
+  color: #c33;
+  padding: 12px 15px;
+  border-radius: 8px;
+  border: 1px solid #fcc;
+  margin-bottom: 20px;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.success-message {
+  background: #efe;
+  color: #393;
+  padding: 12px 15px;
+  border-radius: 8px;
+  border: 1px solid #cfc;
+  margin-bottom: 20px;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* Responsive */
+@media (max-width: 480px) {
+  .auth-container {
+    padding: 30px 20px;
+  }
+  
+  .auth-footer {
+    flex-direction: column;
+    gap: 10px;
+  }
+  
+  .back-login, .back-home {
+    width: 100%;
+    justify-content: center;
+  }
+}
