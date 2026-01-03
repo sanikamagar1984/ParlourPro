@@ -309,3 +309,51 @@ body {
     margin-left: 0;
   }
 }
+/* ===== Validation Error Message ===== */
+.error-message {
+  background: #ffe6e6;
+  color: #b00020;           /* DARK RED */
+  padding: 12px 16px;
+  border-radius: 8px;
+  border-left: 5px solid #b00020;
+  margin-bottom: 20px;
+  font-size: 14px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* Field error highlight */
+.input-error {
+  border: 2px solid #b00020 !important;
+  background: #fff5f5 !important;
+}
+
+/* Small error text under field */
+.field-error {
+  margin-top: 6px;
+  font-size: 13px;
+  color: #b00020;
+  font-weight: 500;
+}
+/* Remove ugly browser focus box */
+input:focus {
+  outline: none;
+  box-shadow: none;
+}
+
+/* Consistent input style */
+input {
+  width: 100%;
+  padding: 12px 14px;
+  border-radius: 8px;
+  border: 1px solid #ddd;
+  font-size: 14px;
+  transition: border-color 0.2s ease;
+}
+
+/* Nice focus border */
+input:focus {
+  border-color: #b45309; /* brown theme */
+}

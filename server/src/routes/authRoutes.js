@@ -1,14 +1,27 @@
 const express = require('express');
 const router = express.Router();
-const { signup, login, forgotPassword } = require('../controllers/authController');
 
-// POST /api/auth/signup
+const {
+  signup,
+  login,
+  logout,
+  forgotPassword,
+  resetPassword,
+  checkAuth  // ← IMPORTANT: Add this import
+} = require('../controllers/authController');
+
+// ===============================
+// AUTH ROUTES
+// ===============================
 router.post('/signup', signup);
-
-// POST /api/auth/login
 router.post('/login', login);
-
-// POST /api/auth/forgot-password
+router.post('/logout', logout);
 router.post('/forgot-password', forgotPassword);
+router.post('/reset-password/:token', resetPassword);
+
+// ===============================
+// CHECK LOGIN STATUS (COOKIE) - UPDATED
+// ===============================
+router.get('/me', checkAuth);  // ← Use the controller function instead of inline
 
 module.exports = router;

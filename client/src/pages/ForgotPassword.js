@@ -19,10 +19,12 @@ function ForgotPassword() {
 
     try {
       // Call backend API for password reset
-      const response = await axios.post('http://localhost:5000/forgot-password', {
-        email,
-      });
-      
+      const response = await axios.post(
+  'http://localhost:5000/api/auth/forgot-password',
+  { email },
+  { withCredentials: true }
+);
+
       setMessage(response.data.message || 'Password reset link sent to your email');
       setEmailSent(true);
     } catch (err) {

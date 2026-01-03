@@ -1,17 +1,27 @@
 const express = require('express');
 const router = express.Router();
-const { getAllUsers, getUserProfile, updateUserProfile } = require('../controllers/userController');
+const authMiddleware = require('../middleware/authMiddleware');
 
-// GET /api/users - Get all users (for testing)
-router.get('/', getAllUsers);
+const {
+  getAllUsers,
+  getUserProfile,
+  updateUserProfile
+} = require('../controllers/userController');
 
-// GET /api/users/:id - Get user profile
-router.get('/:id', getUserProfile);
+// =======================
+// USER ROUTES
+// =======================
 
-// PUT /api/users/:id - Update user profile
-router.put('/:id', updateUserProfile);
+// GET /api/users - Get all users (AUTH REQUIRED)
+router.get('/', authMiddleware, getAllUsers);
 
-// GET /api/users/profile/me - Get current user profile (will add auth later)
-router.get('/profile/me', getUserProfile);
+// GET /api/users/profile/me - Logged-in user profile
+router.get('/profile/me', authMiddleware, getUserProfile);
+
+// GET /api/users/:id - Get user profile by ID (AUTH REQUIRED)
+router.get('/:id', authMiddleware, getUserProfile);
+
+// PUT /api/users/:id - Update user profile (AUTH REQUIRED)
+router.put('/:id', authMiddleware, updateUserProfile);
 
 module.exports = router;

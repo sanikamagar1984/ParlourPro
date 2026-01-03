@@ -12,6 +12,26 @@
   margin: 0 auto;
   padding: 0 20px;
 }
+.nav-btn {
+  padding: 8px 18px;
+  border-radius: 25px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.3s ease;
+}
+
+/* SAME style for both */
+.login-btn,
+.signup-btn {
+  background: #8b4513;
+  color: white;
+  border: none;
+}
+
+.login-btn:hover,
+.signup-btn:hover {
+  background: #6b3410;
+}
 
 /* ====== HEADER STYLES ====== */
 .header {
