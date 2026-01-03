@@ -1,5 +1,5 @@
 /* =========================
-   DASHBOARD CSS - Updated with Sign-in Page Style
+   PARLOURPRO DASHBOARD CSS - PROFESSIONAL
 ========================= */
 
 * {
@@ -72,6 +72,7 @@ body {
   box-shadow: 0 4px 20px rgba(139, 69, 19, 0.2);
   align-items: center;
   justify-content: space-between;
+  height: 70px; /* Fixed height */
 }
 
 .mobile-menu-btn {
@@ -98,6 +99,7 @@ body {
   font-weight: 600;
   letter-spacing: 0.5px;
   color: white;
+  margin: 0; /* Remove default margins */
 }
 
 .user-mobile {
@@ -113,27 +115,50 @@ body {
 }
 
 /* =========================
-   MENU TOGGLE BUTTON
+   MENU TOGGLE BUTTON - FIXED POSITION
 ========================= */
+/* =========================
+   FIX TOGGLE BUTTON OVERLAP ISSUE WHEN SIDEBAR CLOSED
+========================= */
+
 .menu-toggle-btn {
   position: fixed;
   top: 25px;
-  left: 25px;
-  z-index: 1001;
+  left: 305px; /* Position when sidebar is open */
+  z-index: 1001; /* Keep above content */
   background: linear-gradient(135deg, #8b4513, #d2691e);
   color: white;
   border: none;
   border-radius: 12px;
-  padding: 14px 22px;
+  padding: 14px 18px;
   cursor: pointer;
   transition: all 0.3s ease;
   display: flex;
   align-items: center;
-  gap: 12px;
+  justify-content: center;
   box-shadow: 0 6px 20px rgba(139, 69, 19, 0.3);
-  font-weight: 600;
-  font-size: 15px;
-  letter-spacing: 0.5px;
+  font-size: 20px;
+  width: 50px;
+  height: 50px;
+}
+
+/* When sidebar is closed, move the button to left side */
+.sidebar.closed + .main-content + .menu-toggle-btn {
+  left: 25px;
+}
+
+/* When sidebar is open, ensure it's to the right of sidebar */
+.sidebar.open + .main-content + .menu-toggle-btn {
+  left: 305px;
+}
+
+/* Alternative approach - use a single class on body or container */
+.dashboard-container.sidebar-closed .menu-toggle-btn {
+  left: 25px;
+}
+
+.dashboard-container.sidebar-open .menu-toggle-btn {
+  left: 305px;
 }
 
 .menu-toggle-btn:hover {
@@ -141,30 +166,24 @@ body {
   transform: translateY(-3px);
   box-shadow: 0 8px 25px rgba(139, 69, 19, 0.4);
 }
-
 .menu-toggle-btn:active {
   transform: translateY(0);
 }
-
 /* =========================
    SIDEBAR STYLES
 ========================= */
 .sidebar {
   width: 280px;
-  background: linear-gradient(135deg, #2c3e50, #34495e);
+  background: linear-gradient(180deg, #8b4513 0%, #a0522d 50%, #d2691e 100%);
   color: white;
   position: fixed;
   top: 0;
-  left: -280px;
+  left: 0;
   height: 100vh;
-  transition: left 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
   z-index: 1000;
   box-shadow: 4px 0 25px rgba(0, 0, 0, 0.2);
   overflow-y: auto;
-}
-
-.sidebar.open {
-  left: 0;
 }
 
 .sidebar.closed {
@@ -176,6 +195,9 @@ body {
 }
 
 /* Sidebar Header */
+/* =========================
+   SIDEBAR HEADER - IMPROVED
+========================= */
 .sidebar-header {
   padding: 30px 25px;
   background: rgba(0, 0, 0, 0.25);
@@ -183,6 +205,8 @@ body {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  position: relative; /* Add this */
+  z-index: 1002; /* Ensure it's above toggle button */
 }
 
 .logo-container h2 {
@@ -191,6 +215,7 @@ body {
   color: white;
   margin-bottom: 6px;
   letter-spacing: 0.8px;
+  text-align: left; /* Ensure text alignment */
 }
 
 .logo-container p {
@@ -198,9 +223,10 @@ body {
   color: rgba(255, 255, 255, 0.75);
   letter-spacing: 1.2px;
   font-weight: 500;
+  text-align: left; /* Ensure text alignment */
 }
 
-.sidebar-toggle, .mobile-close {
+.mobile-close {
   background: rgba(255, 255, 255, 0.1);
   border: 2px solid rgba(255, 255, 255, 0.2);
   color: white;
@@ -211,18 +237,14 @@ body {
   transition: all 0.3s ease;
   width: 42px;
   height: 42px;
-  display: flex;
+  display: none;
   align-items: center;
   justify-content: center;
 }
 
-.sidebar-toggle:hover, .mobile-close:hover {
+.mobile-close:hover {
   background: rgba(255, 255, 255, 0.2);
   transform: rotate(90deg);
-}
-
-.mobile-close {
-  display: none;
 }
 
 /* User Info */
@@ -238,13 +260,13 @@ body {
 .user-avatar {
   width: 65px;
   height: 65px;
-  background: linear-gradient(135deg, rgba(139, 69, 19, 0.3), rgba(210, 105, 30, 0.3));
+  background: rgba(255, 255, 255, 0.2);
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 30px;
-  border: 3px solid rgba(255, 255, 255, 0.2);
+  border: 3px solid rgba(255, 255, 255, 0.3);
 }
 
 .user-details h4 {
@@ -287,14 +309,14 @@ body {
 }
 
 .sidebar-nav li:hover {
-  background: rgba(255, 255, 255, 0.08);
-  border-left-color: rgba(139, 69, 19, 0.5);
+  background: rgba(255, 255, 255, 0.1);
+  border-left-color: rgba(255, 255, 255, 0.5);
   padding-left: 33px;
 }
 
 .sidebar-nav li.active {
-  background: rgba(139, 69, 19, 0.25);
-  border-left-color: #8b4513;
+  background: rgba(0, 0, 0, 0.3);
+  border-left-color: #fff;
   padding-left: 33px;
 }
 
@@ -305,13 +327,17 @@ body {
 }
 
 .sidebar-nav li.active svg {
-  color: #ffcc80;
+  color: #fff;
 }
 
 .sidebar-nav li span {
   font-size: 15px;
   font-weight: 600;
   color: rgba(255, 255, 255, 0.9);
+}
+
+.sidebar-nav li.active span {
+  color: #fff;
 }
 
 /* Sidebar Footer */
@@ -349,28 +375,49 @@ body {
 /* =========================
    MAIN CONTENT
 ========================= */
+/* Update the main content styles */
 .main-content {
   flex: 1;
   transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
   min-height: 100vh;
   width: 100%;
   background: #f5f6fa;
+  position: relative; /* Add this */
+  z-index: 1; /* Ensure content is below toggle button */
 }
 
 .main-content.with-sidebar {
   margin-left: 280px;
   width: calc(100% - 280px);
+  padding-left: 0; /* Reset padding */
 }
 
 .main-content.full-width {
   margin-left: 0;
   width: 100%;
+  padding-left: 80px; /* Add padding for toggle button */
 }
 
+/* Update content wrapper */
 .content-wrapper {
   padding: 35px;
   max-width: 1400px;
   margin: 0 auto;
+}
+
+/* On mobile, adjust the padding */
+@media (max-width: 768px) {
+  .main-content.with-sidebar,
+  .main-content.full-width {
+    margin-left: 0;
+    width: 100%;
+    padding-left: 0; /* Reset padding on mobile */
+    padding-top: 85px; /* For mobile header */
+  }
+  
+  .content-wrapper {
+    padding: 20px;
+  }
 }
 
 /* =========================
@@ -425,7 +472,7 @@ body {
   font-weight: 500;
 }
 
-/* Stats Grid - All icons same style */
+/* Stats Grid */
 .stats-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
@@ -463,7 +510,6 @@ body {
   border-color: #8b4513;
 }
 
-/* All stat icons same style */
 .stat-icon {
   width: 75px;
   height: 75px;
@@ -1506,6 +1552,14 @@ body {
   
   .content-wrapper {
     padding: 20px;
+  }
+  
+  .sidebar {
+    left: -280px;
+  }
+  
+  .sidebar.mobile-open {
+    left: 0;
   }
   
   .sidebar-overlay {

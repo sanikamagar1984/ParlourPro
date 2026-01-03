@@ -10,20 +10,19 @@ import {
   FaDownload, FaUserFriends, FaHistory, FaCalendarDay, FaFileExcel,
   FaPrint, FaSave, FaCheck, FaChevronDown, FaChevronRight,
   FaCreditCard, FaClock, FaFilter, 
-  FaFilePdf, FaFileCsv, FaCalendar, FaEllipsisV, FaTimesCircle
+  FaFilePdf, FaFileCsv, FaCalendar, FaEllipsisV, FaTimesCircle, FaChevronLeft
 } from 'react-icons/fa';
 import './../css/Dashboard.css';
 
 function Dashboard() {
   const navigate = useNavigate();
-  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [sidebarOpen, setSidebarOpen] = useState(true);
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('dashboard');
   const [activeServiceTab, setActiveServiceTab] = useState('hair');
   
-  // Stats - No manual data, will be calculated from records
   const [stats, setStats] = useState({
     dailyIncome: 0,
     weeklyIncome: 0,
@@ -34,7 +33,6 @@ function Dashboard() {
     todayAppointments: 0
   });
   
-  // All data starts as empty arrays (no manual data)
   const [hairServices, setHairServices] = useState([]);
   const [skinServices, setSkinServices] = useState([]);
   const [tattooServices, setTattooServices] = useState([]);
@@ -43,7 +41,6 @@ function Dashboard() {
   const [customers, setCustomers] = useState([]);
   const [dailyRecords, setDailyRecords] = useState([]);
   
-  // Form States
   const [serviceForm, setServiceForm] = useState({
     id: null,
     category: 'hair',
@@ -80,7 +77,6 @@ function Dashboard() {
     notes: ''
   });
   
-  // Filter states
   const [dateFilter, setDateFilter] = useState('today');
   const [dateRange, setDateRange] = useState({
     start: new Date().toISOString().split('T')[0],
@@ -91,7 +87,6 @@ function Dashboard() {
   const [customerSearch, setCustomerSearch] = useState('');
   const [recordSearch, setRecordSearch] = useState('');
 
-  // Authentication check
   useEffect(() => {
     const checkAuth = async () => {
       try {
@@ -102,7 +97,6 @@ function Dashboard() {
           navigate('/login');
         } else {
           setUser(res.data.user);
-          // No manual data loading - everything starts empty
           calculateStats();
         }
       } catch (error) {
@@ -113,30 +107,25 @@ function Dashboard() {
       }
     };
     checkAuth();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [navigate]);
 
-  // Calculate stats from current data
   const calculateStats = () => {
     const today = new Date().toISOString().split('T')[0];
     const todayRecords = dailyRecords.filter(r => r.date === today);
     const todayIncome = todayRecords.reduce((sum, r) => sum + parseInt(r.price || 0), 0);
     
-    // Calculate weekly income (last 7 days)
     const lastWeek = new Date();
     lastWeek.setDate(lastWeek.getDate() - 7);
     const lastWeekDate = lastWeek.toISOString().split('T')[0];
     const weeklyRecords = dailyRecords.filter(r => r.date >= lastWeekDate);
     const weeklyIncome = weeklyRecords.reduce((sum, r) => sum + parseInt(r.price || 0), 0);
     
-    // Calculate monthly income
     const lastMonth = new Date();
     lastMonth.setMonth(lastMonth.getMonth() - 1);
     const lastMonthDate = lastMonth.toISOString().split('T')[0];
     const monthlyRecords = dailyRecords.filter(r => r.date >= lastMonthDate);
     const monthlyIncome = monthlyRecords.reduce((sum, r) => sum + parseInt(r.price || 0), 0);
     
-    // Total services calculation
     const totalServices = hairServices.length + skinServices.length + tattooServices.length;
     
     setStats({
@@ -150,12 +139,10 @@ function Dashboard() {
     });
   };
 
-  // Update stats when data changes
   useEffect(() => {
     calculateStats();
   }, [hairServices, skinServices, tattooServices, staff, customers, dailyRecords]);
 
-  // Logout
   const handleLogout = async () => {
     try {
       await axios.post('http://localhost:5000/api/auth/logout', {}, {
@@ -167,7 +154,6 @@ function Dashboard() {
     }
   };
 
-  // Service CRUD
   const handleServiceSubmit = (e) => {
     e.preventDefault();
     if (!serviceForm.name || !serviceForm.price) {
@@ -209,7 +195,7 @@ function Dashboard() {
     
     setServiceForm({
       id: null,
-      category: 'hair',
+      category: activeServiceTab,
       name: '',
       price: ''
     });
@@ -224,6 +210,7 @@ function Dashboard() {
       name: service.name,
       price: service.price.toString()
     });
+    setActiveServiceTab(service.category || 'hair');
     setActiveTab('manage-services');
   };
 
@@ -246,7 +233,6 @@ function Dashboard() {
     }
   };
 
-  // Staff CRUD
   const handleStaffSubmit = (e) => {
     e.preventDefault();
     if (!staffForm.name || !staffForm.phone) {
@@ -294,7 +280,6 @@ function Dashboard() {
     }
   };
 
-  // Customer CRUD - No manual data entry
   const handleCustomerSubmit = (e) => {
     e.preventDefault();
     if (!customerForm.name || !customerForm.phone) {
@@ -344,7 +329,6 @@ function Dashboard() {
     }
   };
 
-  // Record Management - Customer selection only from dropdown, no manual entry
   const handleRecordSubmit = (e) => {
     e.preventDefault();
     if (!recordForm.customerId || !recordForm.serviceId || !recordForm.price) {
@@ -372,7 +356,6 @@ function Dashboard() {
     
     setDailyRecords([...dailyRecords, record]);
     
-    // Update customer stats
     setCustomers(customers.map(c => 
       c.id === selectedCustomer.id ? {
         ...c,
@@ -391,7 +374,6 @@ function Dashboard() {
     }
   };
 
-  // Export functions with professional styling
   const exportToCSV = (data, filename) => {
     const headers = Object.keys(data[0]);
     const csvContent = [
@@ -408,7 +390,6 @@ function Dashboard() {
   };
 
   const exportToExcel = (data, filename) => {
-    // Create Excel file with proper styling
     const headers = Object.keys(data[0]);
     let excelContent = `
       <html xmlns:o="urn:schemas-microsoft-com:office:office" 
@@ -416,81 +397,31 @@ function Dashboard() {
             xmlns="http://www.w3.org/TR/REC-html40">
       <head>
         <meta charset="UTF-8">
-        <!--[if gte mso 9]>
-        <xml>
-          <x:ExcelWorkbook>
-            <x:ExcelWorksheets>
-              <x:ExcelWorksheet>
-                <x:Name>${filename}</x:Name>
-                <x:WorksheetOptions>
-                  <x:DisplayGridlines/>
-                </x:WorksheetOptions>
-              </x:ExcelWorksheet>
-            </x:ExcelWorksheets>
-          </x:ExcelWorkbook>
-        </xml>
-        <![endif]-->
         <style>
-          table {
-            border-collapse: collapse;
-            width: 100%;
-          }
-          th {
-            background-color: #8b4513;
-            color: white;
-            font-weight: bold;
-            padding: 10px;
-            text-align: left;
-            border: 1px solid #ddd;
-          }
-          td {
-            padding: 8px;
-            border: 1px solid #ddd;
-          }
-          tr:nth-child(even) {
-            background-color: #f9f9f9;
-          }
-          tr:hover {
-            background-color: #f5f5f5;
-          }
-          .total-row {
-            background-color: #e8f5e9 !important;
-            font-weight: bold;
-          }
-          .amount {
-            color: #2e7d32;
-            font-weight: bold;
-          }
+          table { border-collapse: collapse; width: 100%; }
+          th { background-color: #8b4513; color: white; font-weight: bold; padding: 10px; text-align: left; border: 1px solid #ddd; }
+          td { padding: 8px; border: 1px solid #ddd; }
+          tr:nth-child(even) { background-color: #f9f9f9; }
+          tr:hover { background-color: #f5f5f5; }
+          .amount { color: #2e7d32; font-weight: bold; }
         </style>
       </head>
       <body>
         <table>
-          <thead>
-            <tr>
-              ${headers.map(header => `<th>${header}</th>`).join('')}
-            </tr>
-          </thead>
+          <thead><tr>${headers.map(header => `<th>${header}</th>`).join('')}</tr></thead>
           <tbody>
-            ${data.map(row => `
-              <tr>
-                ${headers.map(header => {
-                  const value = row[header];
-                  const isAmount = header.toLowerCase().includes('price') || 
-                                  header.toLowerCase().includes('income') || 
-                                  header.toLowerCase().includes('amount');
-                  return `<td${isAmount ? ' class="amount"' : ''}>${value}</td>`;
-                }).join('')}
-              </tr>
-            `).join('')}
+            ${data.map(row => `<tr>${headers.map(header => {
+              const value = row[header];
+              const isAmount = header.toLowerCase().includes('price') || header.toLowerCase().includes('income') || header.toLowerCase().includes('amount');
+              return `<td${isAmount ? ' class="amount"' : ''}>${value}</td>`;
+            }).join('')}</tr>`).join('')}
           </tbody>
         </table>
       </body>
       </html>
     `;
     
-    const blob = new Blob([excelContent], { 
-      type: 'application/vnd.ms-excel' 
-    });
+    const blob = new Blob([excelContent], { type: 'application/vnd.ms-excel' });
     const url = window.URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
@@ -506,76 +437,17 @@ function Dashboard() {
           <title>${filename}</title>
           <style>
             @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
-            
-            body { 
-              font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
-              margin: 40px; 
-              color: #333;
-              background: #f8f9fa;
-            }
-            .report-header {
-              text-align: center;
-              margin-bottom: 30px;
-              padding-bottom: 20px;
-              border-bottom: 2px solid #8b4513;
-            }
-            .report-header h1 {
-              color: #8b4513;
-              margin: 0;
-              font-size: 28px;
-              font-weight: 600;
-            }
-            .report-header p {
-              color: #666;
-              margin: 5px 0 0 0;
-              font-size: 14px;
-            }
-            table { 
-              width: 100%; 
-              border-collapse: collapse; 
-              margin-top: 20px;
-              box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-              border-radius: 8px;
-              overflow: hidden;
-            }
-            th { 
-              background: linear-gradient(135deg, #8b4513, #d2691e);
-              color: white; 
-              padding: 12px 15px; 
-              text-align: left; 
-              font-weight: 600;
-              font-size: 14px;
-              text-transform: uppercase;
-              letter-spacing: 0.5px;
-            }
-            td { 
-              padding: 12px 15px; 
-              border-bottom: 1px solid #e1e5eb;
-              font-size: 14px;
-            }
-            tr:nth-child(even) {
-              background-color: #f8f9fa;
-            }
-            tr:hover {
-              background-color: #f1f3f5;
-            }
-            .amount {
-              color: #2e7d32;
-              font-weight: 600;
-            }
-            .report-footer {
-              margin-top: 30px;
-              padding-top: 20px;
-              border-top: 1px solid #e1e5eb;
-              text-align: right;
-              color: #666;
-              font-size: 12px;
-            }
-            @media print {
-              body { margin: 20px; }
-              .no-print { display: none; }
-              table { box-shadow: none; }
-            }
+            body { font-family: 'Inter', 'Segoe UI', sans-serif; margin: 40px; color: #333; background: #f8f9fa; }
+            .report-header { text-align: center; margin-bottom: 30px; padding-bottom: 20px; border-bottom: 2px solid #8b4513; }
+            .report-header h1 { color: #8b4513; margin: 0; font-size: 28px; font-weight: 600; }
+            .report-header p { color: #666; margin: 5px 0 0 0; font-size: 14px; }
+            table { width: 100%; border-collapse: collapse; margin-top: 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
+            th { background: linear-gradient(135deg, #8b4513, #d2691e); color: white; padding: 12px 15px; text-align: left; font-weight: 600; }
+            td { padding: 12px 15px; border-bottom: 1px solid #e1e5eb; }
+            tr:nth-child(even) { background-color: #f8f9fa; }
+            tr:hover { background-color: #f1f3f5; }
+            .amount { color: #2e7d32; font-weight: 600; }
+            @media print { body { margin: 20px; } .no-print { display: none; } }
           </style>
         </head>
         <body>
@@ -584,29 +456,15 @@ function Dashboard() {
             <p>Generated on: ${new Date().toLocaleDateString()} ${new Date().toLocaleTimeString()}</p>
           </div>
           <table>
-            <thead>
-              <tr>
-                ${Object.keys(data[0]).map(key => `<th>${key}</th>`).join('')}
-              </tr>
-            </thead>
+            <thead><tr>${Object.keys(data[0]).map(key => `<th>${key}</th>`).join('')}</tr></thead>
             <tbody>
-              ${data.map(row => `
-                <tr>
-                  ${Object.entries(row).map(([key, value]) => {
-                    const isAmount = key.toLowerCase().includes('price') || 
-                                    key.toLowerCase().includes('income') || 
-                                    key.toLowerCase().includes('amount');
-                    return `<td${isAmount ? ' class="amount"' : ''}>${value}</td>`;
-                  }).join('')}
-                </tr>
-              `).join('')}
+              ${data.map(row => `<tr>${Object.entries(row).map(([key, value]) => {
+                const isAmount = key.toLowerCase().includes('price') || key.toLowerCase().includes('income') || key.toLowerCase().includes('amount');
+                return `<td${isAmount ? ' class="amount"' : ''}>${value}</td>`;
+              }).join('')}</tr>`).join('')}
             </tbody>
           </table>
-          <div class="report-footer">
-            <p>Total Records: ${data.length}</p>
-            <p>© ${new Date().getFullYear()} ParlourPro Management System</p>
-          </div>
-          <button class="no-print" onclick="window.print()" style="margin-top: 30px; padding: 12px 24px; background: linear-gradient(135deg, #8b4513, #d2691e); color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 14px; font-weight: 500;">
+          <button class="no-print" onclick="window.print()" style="margin-top: 30px; padding: 12px 24px; background: linear-gradient(135deg, #8b4513, #d2691e); color: white; border: none; border-radius: 6px; cursor: pointer;">
             Print/Save as PDF
           </button>
         </body>
@@ -615,7 +473,6 @@ function Dashboard() {
     printWindow.document.close();
   };
 
-  // Generate report function for each management section
   const generateReport = (type, format) => {
     let data = [];
     let filename = '';
@@ -639,7 +496,6 @@ function Dashboard() {
         break;
       default:
         data = [];
-        filename = `report-${new Date().toISOString().split('T')[0]}`;
     }
     
     if (data.length === 0) {
@@ -662,7 +518,6 @@ function Dashboard() {
     }
   };
 
-  // Helper functions
   const getFilteredServices = () => {
     const allServices = [...hairServices, ...skinServices, ...tattooServices];
     return allServices.filter(service => 
@@ -750,6 +605,10 @@ function Dashboard() {
     }
   };
 
+  useEffect(() => {
+    setServiceForm(prev => ({ ...prev, category: activeServiceTab }));
+  }, [activeServiceTab]);
+
   if (loading) {
     return (
       <div className="loading-screen">
@@ -759,7 +618,6 @@ function Dashboard() {
     );
   }
 
-  // Sidebar Component with better close icon
   const Sidebar = () => (
     <aside className={`sidebar ${sidebarOpen ? 'open' : 'closed'} ${mobileSidebarOpen ? 'mobile-open' : ''}`}>
       <div className="sidebar-header">
@@ -767,9 +625,6 @@ function Dashboard() {
           <h2>ParlourPro</h2>
           <p>Admin Panel</p>
         </div>
-        <button className="sidebar-toggle" onClick={() => setSidebarOpen(!sidebarOpen)}>
-          {sidebarOpen ? <FaTimesCircle /> : <FaEllipsisV />}
-        </button>
         <button className="mobile-close" onClick={() => setMobileSidebarOpen(false)}>
           <FaTimes />
         </button>
@@ -814,7 +669,6 @@ function Dashboard() {
     </aside>
   );
 
-  // Dashboard Content
   const DashboardContent = () => (
     <div className="dashboard-content">
       <div className="welcome-section">
@@ -824,7 +678,7 @@ function Dashboard() {
       
       <div className="stats-grid">
         <div className="stat-card">
-          <div className="stat-icon income">
+          <div className="stat-icon">
             <FaMoneyBillWave />
           </div>
           <div className="stat-info">
@@ -834,7 +688,7 @@ function Dashboard() {
         </div>
         
         <div className="stat-card">
-          <div className="stat-icon customers">
+          <div className="stat-icon">
             <FaUsers />
           </div>
           <div className="stat-info">
@@ -844,7 +698,7 @@ function Dashboard() {
         </div>
         
         <div className="stat-card">
-          <div className="stat-icon services">
+          <div className="stat-icon">
             <FaClipboardList />
           </div>
           <div className="stat-info">
@@ -854,7 +708,7 @@ function Dashboard() {
         </div>
         
         <div className="stat-card">
-          <div className="stat-icon staff">
+          <div className="stat-icon">
             <FaUserFriends />
           </div>
           <div className="stat-info">
@@ -931,7 +785,6 @@ function Dashboard() {
     </div>
   );
 
-  // Manage Services Content
   const ManageServicesContent = () => (
     <div className="manage-services">
       <div className="section-header">
@@ -964,24 +817,12 @@ function Dashboard() {
         <div className="filter-controls">
           <div className="search-bar">
             <FaSearch />
-            <input
-              type="text"
-              placeholder="Search services by name or category..."
-              value={serviceSearch}
-              onChange={(e) => setServiceSearch(e.target.value)}
-              className="search-input"
-            />
+            <input type="text" placeholder="Search services..." value={serviceSearch} onChange={(e) => setServiceSearch(e.target.value)} className="search-input" />
           </div>
           <div className="export-options">
-            <button onClick={() => generateReport('services', 'csv')} className="export-btn">
-              <FaFileCsv /> CSV
-            </button>
-            <button onClick={() => generateReport('services', 'excel')} className="export-btn">
-              <FaFileExcel /> XLS
-            </button>
-            <button onClick={() => generateReport('services', 'pdf')} className="export-btn">
-              <FaFilePdf /> PDF
-            </button>
+            <button onClick={() => generateReport('services', 'csv')} className="export-btn"><FaFileCsv /> CSV</button>
+            <button onClick={() => generateReport('services', 'excel')} className="export-btn"><FaFileExcel /> XLS</button>
+            <button onClick={() => generateReport('services', 'pdf')} className="export-btn"><FaFilePdf /> PDF</button>
           </div>
         </div>
       </div>
@@ -992,11 +833,7 @@ function Dashboard() {
           <div className="form-row">
             <div className="form-group">
               <label>Category</label>
-              <select 
-                value={serviceForm.category}
-                onChange={(e) => setServiceForm({...serviceForm, category: e.target.value})}
-                required
-              >
+              <select value={serviceForm.category} onChange={(e) => setServiceForm({...serviceForm, category: e.target.value})} required>
                 <option value="hair">Hair</option>
                 <option value="skin">Skin</option>
                 <option value="tattoo">Tattoo</option>
@@ -1004,23 +841,11 @@ function Dashboard() {
             </div>
             <div className="form-group">
               <label>Service Name *</label>
-              <input
-                type="text"
-                value={serviceForm.name}
-                onChange={(e) => setServiceForm({...serviceForm, name: e.target.value})}
-                placeholder="e.g., Hair Cut, Facial, Tattoo"
-                required
-              />
+              <input type="text" value={serviceForm.name} onChange={(e) => setServiceForm({...serviceForm, name: e.target.value})} placeholder="e.g., Hair Cut, Facial" required />
             </div>
             <div className="form-group">
               <label>Price (₹) *</label>
-              <input
-                type="number"
-                value={serviceForm.price}
-                onChange={(e) => setServiceForm({...serviceForm, price: e.target.value})}
-                placeholder="Enter price"
-                required
-              />
+              <input type="number" value={serviceForm.price} onChange={(e) => setServiceForm({...serviceForm, price: e.target.value})} placeholder="Enter price" required />
             </div>
           </div>
           <div className="form-actions">
@@ -1029,7 +854,7 @@ function Dashboard() {
               {serviceForm.id ? 'Update Service' : 'Add Service'}
             </button>
             {serviceForm.id && (
-              <button type="button" className="btn-secondary" onClick={() => setServiceForm({ id: null, category: 'hair', name: '', price: '' })}>
+              <button type="button" className="btn-secondary" onClick={() => setServiceForm({ id: null, category: activeServiceTab, name: '', price: '' })}>
                 <FaTimes /> Cancel
               </button>
             )}
@@ -1050,26 +875,19 @@ function Dashboard() {
                 <span className={`service-category ${service.category}`}>{service.category}</span>
               </div>
               <div className="service-actions">
-                <button onClick={() => editService(service)} className="btn-edit">
-                  <FaEdit /> Edit
-                </button>
-                <button onClick={() => deleteService(service.id, service.category)} className="btn-delete">
-                  <FaTrash /> Delete
-                </button>
+                <button onClick={() => editService(service)} className="btn-edit"><FaEdit /> Edit</button>
+                <button onClick={() => deleteService(service.id, service.category)} className="btn-delete"><FaTrash /> Delete</button>
               </div>
             </div>
           ))}
           {getFilteredServices().length === 0 && (
-            <div className="no-data">
-              <p>No services found. Add your first service above!</p>
-            </div>
+            <div className="no-data"><p>No services found. Add your first service above!</p></div>
           )}
         </div>
       </div>
     </div>
   );
 
-  // Staff Management Content
   const StaffManagementContent = () => (
     <div className="staff-management">
       <div className="section-header">
@@ -1081,24 +899,12 @@ function Dashboard() {
         <div className="filter-controls">
           <div className="search-bar">
             <FaSearch />
-            <input
-              type="text"
-              placeholder="Search staff by name or phone..."
-              value={staffSearch}
-              onChange={(e) => setStaffSearch(e.target.value)}
-              className="search-input"
-            />
+            <input type="text" placeholder="Search staff..." value={staffSearch} onChange={(e) => setStaffSearch(e.target.value)} className="search-input" />
           </div>
           <div className="export-options">
-            <button onClick={() => generateReport('staff', 'csv')} className="export-btn">
-              <FaFileCsv /> CSV
-            </button>
-            <button onClick={() => generateReport('staff', 'excel')} className="export-btn">
-              <FaFileExcel /> XLS
-            </button>
-            <button onClick={() => generateReport('staff', 'pdf')} className="export-btn">
-              <FaFilePdf /> PDF
-            </button>
+            <button onClick={() => generateReport('staff', 'csv')} className="export-btn"><FaFileCsv /> CSV</button>
+            <button onClick={() => generateReport('staff', 'excel')} className="export-btn"><FaFileExcel /> XLS</button>
+            <button onClick={() => generateReport('staff', 'pdf')} className="export-btn"><FaFilePdf /> PDF</button>
           </div>
         </div>
       </div>
@@ -1113,7 +919,7 @@ function Dashboard() {
             </div>
             <div className="form-group">
               <label>Phone Number *</label>
-              <input type="tel" value={staffForm.phone} onChange={(e) => setStaffForm({...staffForm, phone: e.target.value})} placeholder="10-digit mobile number" required />
+              <input type="tel" value={staffForm.phone} onChange={(e) => setStaffForm({...staffForm, phone: e.target.value})} placeholder="10-digit mobile" required />
             </div>
             <div className="form-group">
               <label>Email Address</label>
@@ -1144,7 +950,6 @@ function Dashboard() {
           <table className="data-table">
             <thead>
               <tr>
-                <th>ID</th>
                 <th>Name</th>
                 <th>Phone</th>
                 <th>Email</th>
@@ -1155,7 +960,6 @@ function Dashboard() {
             <tbody>
               {getFilteredStaff().map(member => (
                 <tr key={member.id}>
-                  <td>{member.id}</td>
                   <td>{member.name}</td>
                   <td>{member.phone}</td>
                   <td>{member.email || '-'}</td>
@@ -1167,7 +971,7 @@ function Dashboard() {
                 </tr>
               ))}
               {getFilteredStaff().length === 0 && (
-                <tr><td colSpan="6" className="no-data">No staff members found. Add your first staff member above!</td></tr>
+                <tr><td colSpan="5" className="no-data">No staff members found.</td></tr>
               )}
             </tbody>
           </table>
@@ -1176,7 +980,6 @@ function Dashboard() {
     </div>
   );
 
-  // Customer Management Content (No manual data entry)
   const CustomerManagementContent = () => (
     <div className="customer-management">
       <div className="section-header">
@@ -1188,24 +991,12 @@ function Dashboard() {
         <div className="filter-controls">
           <div className="search-bar">
             <FaSearch />
-            <input
-              type="text"
-              placeholder="Search customers by name or phone..."
-              value={customerSearch}
-              onChange={(e) => setCustomerSearch(e.target.value)}
-              className="search-input"
-            />
+            <input type="text" placeholder="Search customers..." value={customerSearch} onChange={(e) => setCustomerSearch(e.target.value)} className="search-input" />
           </div>
           <div className="export-options">
-            <button onClick={() => generateReport('customers', 'csv')} className="export-btn">
-              <FaFileCsv /> CSV
-            </button>
-            <button onClick={() => generateReport('customers', 'excel')} className="export-btn">
-              <FaFileExcel /> XLS
-            </button>
-            <button onClick={() => generateReport('customers', 'pdf')} className="export-btn">
-              <FaFilePdf /> PDF
-            </button>
+            <button onClick={() => generateReport('customers', 'csv')} className="export-btn"><FaFileCsv /> CSV</button>
+            <button onClick={() => generateReport('customers', 'excel')} className="export-btn"><FaFileExcel /> XLS</button>
+            <button onClick={() => generateReport('customers', 'pdf')} className="export-btn"><FaFilePdf /> PDF</button>
           </div>
         </div>
       </div>
@@ -1220,14 +1011,14 @@ function Dashboard() {
             </div>
             <div className="form-group">
               <label>Phone Number *</label>
-              <input type="tel" value={customerForm.phone} onChange={(e) => setCustomerForm({...customerForm, phone: e.target.value})} placeholder="10-digit mobile number" required />
+              <input type="tel" value={customerForm.phone} onChange={(e) => setCustomerForm({...customerForm, phone: e.target.value})} placeholder="10-digit mobile" required />
             </div>
             <div className="form-group">
               <label>Email Address</label>
               <input type="email" value={customerForm.email} onChange={(e) => setCustomerForm({...customerForm, email: e.target.value})} placeholder="email@example.com" />
             </div>
             <div className="form-group">
-              <label>Address (Optional)</label>
+              <label>Address</label>
               <input type="text" value={customerForm.address} onChange={(e) => setCustomerForm({...customerForm, address: e.target.value})} placeholder="City, Area" />
             </div>
           </div>
@@ -1277,22 +1068,17 @@ function Dashboard() {
               <div className="customer-actions">
                 <button onClick={() => editCustomer(customer)} className="btn-edit"><FaEdit /> Edit</button>
                 <button onClick={() => deleteCustomer(customer.id)} className="btn-delete"><FaTrash /> Delete</button>
-                <button className="btn-primary" onClick={() => {
-                  setRecordForm({...recordForm, customerId: customer.id, customerName: customer.name, phone: customer.phone});
-                  setActiveTab('record-management');
-                }}><FaCalendarAlt /> Book Service</button>
               </div>
             </div>
           ))}
           {getFilteredCustomers().length === 0 && (
-            <div className="no-data"><p>No customers found. Add your first customer above!</p></div>
+            <div className="no-data"><p>No customers found.</p></div>
           )}
         </div>
       </div>
     </div>
   );
 
-  // Record Management Content (Customer selection only from dropdown)
   const RecordManagementContent = () => {
     const filteredRecords = getFilteredRecords();
     const totalIncome = calculateIncome();
@@ -1346,7 +1132,7 @@ function Dashboard() {
               </div>
               
               <div className="form-group">
-                <label>Service Category</label>
+                <label>Category</label>
                 <input type="text" value={recordForm.category} readOnly className="read-only" />
               </div>
               
@@ -1395,7 +1181,7 @@ function Dashboard() {
               </div>
               
               <div className="filter-group">
-                <label>Filter by Date:</label>
+                <label>Filter:</label>
                 <select value={dateFilter} onChange={(e) => setDateFilter(e.target.value)}>
                   <option value="all">All Records</option>
                   <option value="today">Today</option>
@@ -1424,15 +1210,9 @@ function Dashboard() {
               )}
               
               <div className="export-options">
-                <button onClick={() => generateReport('records', 'csv')} className="export-btn">
-                  <FaFileCsv /> CSV
-                </button>
-                <button onClick={() => generateReport('records', 'excel')} className="export-btn">
-                  <FaFileExcel /> XLS
-                </button>
-                <button onClick={() => generateReport('records', 'pdf')} className="export-btn">
-                  <FaFilePdf /> PDF
-                </button>
+                <button onClick={() => generateReport('records', 'csv')} className="export-btn"><FaFileCsv /> CSV</button>
+                <button onClick={() => generateReport('records', 'excel')} className="export-btn"><FaFileExcel /> XLS</button>
+                <button onClick={() => generateReport('records', 'pdf')} className="export-btn"><FaFilePdf /> PDF</button>
               </div>
             </div>
           </div>
@@ -1467,7 +1247,7 @@ function Dashboard() {
                   </tr>
                 ))}
                 {filteredRecords.length === 0 && (
-                  <tr><td colSpan="8" className="no-data">No records found for the selected filter.</td></tr>
+                  <tr><td colSpan="8" className="no-data">No records found.</td></tr>
                 )}
               </tbody>
               <tfoot>
@@ -1499,8 +1279,7 @@ function Dashboard() {
       </header>
       
       <button className="menu-toggle-btn" onClick={() => setSidebarOpen(!sidebarOpen)}>
-        {sidebarOpen ? <FaTimesCircle /> : <FaEllipsisV />}
-        {sidebarOpen ? 'Close Menu' : 'Menu'}
+        {sidebarOpen ? <FaChevronLeft /> : <FaBars />}
       </button>
       
       <Sidebar />
