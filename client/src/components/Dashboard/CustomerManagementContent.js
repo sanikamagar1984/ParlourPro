@@ -107,21 +107,16 @@ const CustomerManagementContent = ({
           <div key={customer.id} className="customer-card">
             <div className="customer-header">
               <div className="customer-avatar"><FaUserCircle /></div>
+             
               <div className="customer-info">
                 <h3>{customer.name}</h3>
                 <p className="customer-phone">{customer.phone}</p>
                 {customer.email && <p className="customer-email">{customer.email}</p>}
               </div>
+              
             </div>
             <div className="customer-details">
-              <div className="detail-item">
-                <span className="detail-label">Total Visits:</span>
-                <span className="detail-value">{customer.totalVisits || 0}</span>
-              </div>
-              <div className="detail-item">
-                <span className="detail-label">Total Spent:</span>
-                <span className="detail-value">₹{customer.totalSpent || 0}</span>
-              </div>
+
               {customer.address && (
                 <div className="detail-item">
                   <span className="detail-label">Address:</span>

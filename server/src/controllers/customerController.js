@@ -1,16 +1,15 @@
+// server/src/controllers/customerController.js
 const { query } = require('../config/authdb');
 
 // =======================
-// Get all customers
+// Get all customers (UPDATED - removed total_spent and total_visits)
 // =======================
 exports.getAllCustomers = async (req, res) => {
   try {
     const result = await query(
-      `SELECT * FROM customers 
-       ORDER BY 
-         CASE WHEN total_spent > 0 THEN 0 ELSE 1 END,
-         total_spent DESC, 
-         name`
+      `SELECT id, name, phone, email, address, created_at, updated_at 
+       FROM customers 
+       ORDER BY name`
     );
 
     res.json({
@@ -35,7 +34,8 @@ exports.getCustomerById = async (req, res) => {
     const { id } = req.params;
     
     const result = await query(
-      `SELECT * FROM customers WHERE id = $1`,
+      `SELECT id, name, phone, email, address, created_at, updated_at 
+       FROM customers WHERE id = $1`,
       [id]
     );
 
@@ -102,7 +102,7 @@ exports.createCustomer = async (req, res) => {
     const result = await query(
       `INSERT INTO customers (name, phone, email, address) 
        VALUES ($1, $2, $3, $4) 
-       RETURNING *`,
+       RETURNING id, name, phone, email, address, created_at, updated_at`,
       [name, phone, email || null, address || null]
     );
 
@@ -172,7 +172,7 @@ exports.updateCustomer = async (req, res) => {
            address = COALESCE($4, address),
            updated_at = CURRENT_TIMESTAMP
        WHERE id = $5
-       RETURNING *`,
+       RETURNING id, name, phone, email, address, created_at, updated_at`,
       [name, phone, email, address, id]
     );
 
@@ -217,7 +217,6 @@ exports.deleteCustomer = async (req, res) => {
     );
 
     if (parseInt(recordsCheck.rows[0].count) > 0) {
-      // Instead of deleting, mark as inactive or just don't delete
       return res.status(400).json({
         success: false,
         error: 'Cannot delete customer with service records. Consider archiving instead.'
@@ -255,7 +254,8 @@ exports.searchCustomers = async (req, res) => {
     }
 
     const result = await query(
-      `SELECT * FROM customers 
+      `SELECT id, name, phone, email, address, created_at, updated_at 
+       FROM customers 
        WHERE name ILIKE $1 
           OR phone ILIKE $1 
           OR email ILIKE $1 
@@ -279,16 +279,16 @@ exports.searchCustomers = async (req, res) => {
 };
 
 // =======================
-// Get top customers by spending
+// Get top customers by date (NEWEST CUSTOMERS)
 // =======================
 exports.getTopCustomers = async (req, res) => {
   try {
     const { limit = 10 } = req.query;
     
     const result = await query(
-      `SELECT * FROM customers 
-       WHERE total_spent > 0
-       ORDER BY total_spent DESC 
+      `SELECT id, name, phone, email, address, created_at, updated_at 
+       FROM customers 
+       ORDER BY created_at DESC 
        LIMIT $1`,
       [parseInt(limit)]
     );
@@ -304,25 +304,5 @@ exports.getTopCustomers = async (req, res) => {
       success: false,
       error: 'Server error'
     });
-  }
-};
-
-// =======================
-// Update customer stats after service
-// =======================
-exports.updateCustomerStats = async (customerId, servicePrice) => {
-  try {
-    await query(
-      `UPDATE customers 
-       SET total_visits = total_visits + 1,
-           total_spent = total_spent + $1,
-           updated_at = CURRENT_TIMESTAMP
-       WHERE id = $2`,
-      [servicePrice, customerId]
-    );
-    return true;
-  } catch (error) {
-    console.error('❌ Update customer stats error:', error.message);
-    return false;
   }
 };

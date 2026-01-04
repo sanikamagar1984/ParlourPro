@@ -6,7 +6,7 @@ import * as XLSX from 'xlsx';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import { FaFilePdf } from 'react-icons/fa';
-
+import { FaTimes } from 'react-icons/fa';
 
 import {
   servicesAPI,
@@ -15,7 +15,7 @@ import {
   recordsAPI
 } from '../services/api';
 
-import { FaTimes } from 'react-icons/fa';
+
 
 // Components
 import Sidebar from '../components/Dashboard/Sidebar';
@@ -27,13 +27,16 @@ import RecordManagementContent from '../components/Dashboard/RecordManagementCon
 
 import './../css/Dashboard.css';
 
+
+
+
 function Dashboard() {
   const navigate = useNavigate();
 
 const getFilteredStaff = () => {
   return staff;
 };
-
+const [customerSearch, setCustomerSearch] = useState('');
   /* ================= UI STATE ================= */
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
@@ -528,32 +531,258 @@ const deleteEmployee = async (id) => {
 
 
   /* ================= CUSTOMERS ================= */
-  const fetchCustomers = async () => {
-    const res = await customersAPI.getAll();
-    setCustomers(res.data.customers || []);
-  };
+/* ================= CUSTOMERS ================= */
+const fetchCustomers = async () => {
+  const res = await customersAPI.getAll();
+  setCustomers(res.data.customers || []);
+};
 
-  const handleCustomerSubmit = async (e) => {
-    e.preventDefault();
+const handleCustomerSubmit = async (e) => {
+  e.preventDefault();
 
-    if (customerForm.id) {
-      await customersAPI.update(customerForm.id, customerForm);
-    } else {
-      await customersAPI.create(customerForm);
+  if (customerForm.id) {
+    await customersAPI.update(customerForm.id, customerForm);
+  } else {
+    await customersAPI.create(customerForm);
+  }
+
+  setCustomerForm({ id: null, name: '', phone: '', email: '', address: '' });
+  fetchCustomers();
+  showNotification('Success', 'Customer saved');
+};
+
+const deleteCustomer = async (id) => {
+  if (!window.confirm('Delete customer?')) return;
+
+  await customersAPI.delete(id);
+  fetchCustomers();
+  showNotification('Success', 'Customer deleted');
+};
+
+const getFilteredCustomers = () => {
+  if (!customerSearch.trim()) return customers;
+  
+  const searchTerm = customerSearch.toLowerCase();
+  return customers.filter(customer =>
+    customer.name.toLowerCase().includes(searchTerm) ||
+    customer.phone.toLowerCase().includes(searchTerm) ||
+    (customer.email && customer.email.toLowerCase().includes(searchTerm)) ||
+    (customer.address && customer.address.toLowerCase().includes(searchTerm))
+  );
+};
+
+// Helper function to format phone numbers
+const formatPhoneNumber = (phone) => {
+  if (!phone) return '';
+  
+
+  
+  // Return original if can't format
+  return phone.toString().replace(/\D/g, '');
+};
+
+const generateReport = async (type, format) => {
+  if (type === 'customers') {
+    const customersData = getFilteredCustomers();
+    
+    if (customersData.length === 0) {
+      showNotification('Info', 'No customers to export', 'info');
+      return;
     }
+    
+    if (format === 'csv') {
+      downloadCustomersCSV(customersData);
+    } else if (format === 'excel') {
+      downloadCustomersExcel(customersData);
+    } else if (format === 'pdf') {
+      downloadCustomersPDF(customersData);
+    }
+    
+    showNotification('Success', `Report exported as ${format.toUpperCase()}`, 'success');
+  }
+};
 
-    setCustomerForm({ id: null, name: '', phone: '', email: '', address: '' });
-    fetchCustomers();
-    showNotification('Success', 'Customer saved');
+const downloadCustomersCSV = (customersData) => {
+  let csv = 'Tressence by Simi - Customers Report\n';
+  csv += 'Date: ' + new Date().toLocaleDateString() + '\n';
+  csv += 'Total Customers: ' + customersData.length + '\n\n';
+  
+  csv += 'Sr No,Name,Phone,Email,Address,Member Since\n';
+
+  customersData.forEach((customer, i) => {
+    const phone = formatPhoneNumber(customer.phone) || '';
+    const memberSince = new Date(customer.created_at || customer.updated_at || new Date()).toLocaleDateString();
+    
+    // CSV escaping
+    const escapeCSV = (str) => {
+      if (str === null || str === undefined) return '';
+      str = str.toString();
+      if (str.includes(',') || str.includes('"') || str.includes('\n')) {
+        return '"' + str.replace(/"/g, '""') + '"';
+      }
+      return str;
+    };
+    
+    csv += `${i + 1},${escapeCSV(customer.name || '')},${escapeCSV(phone)},${escapeCSV(customer.email || '')},${escapeCSV(customer.address || '')},${escapeCSV(memberSince)}\n`;
+  });
+
+  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `Tressence_Customers_${new Date().toISOString().split('T')[0]}.csv`;
+  a.click();
+};
+
+const downloadCustomersExcel = (customersData) => {
+  // Prepare data with formatted phone numbers
+  const data = customersData.map((customer, i) => ({
+    'Sr No': i + 1,
+    'Name': customer.name || '',
+    'Phone': formatPhoneNumber(customer.phone) || '',
+    'Email': customer.email || '',
+    'Address': customer.address || '',
+    'Member Since': new Date(customer.created_at || customer.updated_at || new Date()).toLocaleDateString()
+  }));
+
+  // Create worksheet
+  const worksheet = XLSX.utils.json_to_sheet(data);
+  
+  // Set column widths
+  worksheet['!cols'] = [
+    { wch: 8 },  // Sr No
+    { wch: 25 }, // Name
+    { wch: 15 }, // Phone (formatted)
+    { wch: 35 }, // Email
+    { wch: 30 }, // Address
+    { wch: 12 }  // Member Since
+  ];
+
+  // Style header row
+  const headerStyle = {
+    font: { bold: true, color: { rgb: 'FFFFFF' } },
+    fill: { fgColor: { rgb: '8B4513' } }, // Brown
+    alignment: { horizontal: 'center' }
   };
 
-  const deleteCustomer = async (id) => {
-    if (!window.confirm('Delete customer?')) return;
+  // Apply header style to all header cells
+  const range = XLSX.utils.decode_range(worksheet['!ref']);
+  for (let C = range.s.c; C <= range.e.c; ++C) {
+    const cell = worksheet[XLSX.utils.encode_cell({ r: 0, c: C })];
+    if (cell) cell.s = headerStyle;
+  }
 
-    await customersAPI.delete(id);
-    fetchCustomers();
-    showNotification('Success', 'Customer deleted');
-  };
+  // Create workbook and add sheet
+  const workbook = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(workbook, worksheet, 'Customers');
+  
+  // Save file
+  XLSX.writeFile(
+    workbook,
+    `Tressence_Customers_${new Date().toISOString().split('T')[0]}.xlsx`
+  );
+};
+
+const downloadCustomersPDF = (customersData) => {
+  const doc = new jsPDF('p', 'mm', 'a4');
+  
+  // Header
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(22);
+  doc.setTextColor(139, 69, 19); // Brown
+  doc.text('Tressence by Simi', 14, 18);
+  
+  doc.setFontSize(11);
+  doc.setFont('helvetica', 'normal');
+  doc.setTextColor(90); // Dark gray
+  doc.text('Customer Management Report', 14, 26);
+  
+  doc.setFontSize(10);
+  doc.text(`Generated on: ${new Date().toLocaleDateString()}`, 14, 33);
+  doc.text(`Total Customers: ${customersData.length}`, 14, 38);
+  
+  // Prepare table data with formatted phone numbers
+  const tableData = customersData.map((customer, index) => [
+    index + 1,
+    customer.name || 'N/A',
+    formatPhoneNumber(customer.phone) || 'N/A',
+    customer.email || 'N/A',
+    customer.address || 'N/A',
+    new Date(customer.created_at || customer.updated_at || new Date()).toLocaleDateString()
+  ]);
+  
+  // Create table
+  autoTable(doc, {
+    startY: 45,
+    head: [['#', 'Name', 'Phone', 'Email', 'Address', 'Member Since']],
+    body: tableData,
+    theme: 'grid',
+    
+    headStyles: {
+      fillColor: [139, 69, 19],
+      textColor: [255, 255, 255],
+      fontSize: 10,
+      fontStyle: 'bold',
+      halign: 'center'
+    },
+    
+    bodyStyles: {
+      fontSize: 9,
+      textColor: [40, 40, 40],
+      cellPadding: 4
+    },
+    
+    alternateRowStyles: {
+      fillColor: [248, 248, 248]
+    },
+    
+    columnStyles: {
+      0: { cellWidth: 10, halign: 'center' },
+      1: { cellWidth: 30, halign: 'left' },
+      2: { cellWidth: 25, halign: 'left' }, // Phone column
+      3: { cellWidth: 40, halign: 'left' },
+      4: { cellWidth: 40, halign: 'left' },
+      5: { cellWidth: 25, halign: 'center' }
+    },
+    
+    // Optional: Set phone column to monospaced font for better alignment
+    didParseCell: function(data) {
+      if (data.column.index === 2) { // Phone column
+        data.cell.styles.fontStyle = 'normal';
+        data.cell.styles.font = 'helvetica';
+      }
+    }
+  });
+  
+  // Footer
+  const finalY = doc.lastAutoTable.finalY || 45;
+  doc.setFontSize(9);
+  doc.setTextColor(120);
+  doc.setFont('helvetica', 'italic');
+  doc.text(
+    '© Tressence by Simi | Luxury Beauty Salon',
+    14,
+    finalY + 10
+  );
+  
+  const fileName = `Tressence_Customers_${new Date().toISOString().split('T')[0]}.pdf`;
+  doc.save(fileName);
+};
+
+const editCustomer = (customer) => {
+  setCustomerForm({
+    id: customer.id,
+    name: customer.name || '',
+    phone: customer.phone || '',
+    email: customer.email || '',
+    address: customer.address || ''
+  });
+  
+  // Scroll to form section
+  document.querySelector('.customer-form-section')?.scrollIntoView({ behavior: 'smooth' });
+};
+
 
   /* ================= RECORDS ================= */
   const fetchRecords = async () => {
@@ -705,15 +934,20 @@ if (loading) {
 )}
 
 
-        {activeTab === 'customer-management' && (
-          <CustomerManagementContent
-            customers={customers}
-            customerForm={customerForm}
-            setCustomerForm={setCustomerForm}
-            handleCustomerSubmit={handleCustomerSubmit}
-            deleteCustomer={deleteCustomer}
-          />
-        )}
+       {activeTab === 'customer-management' && (
+  <CustomerManagementContent
+    customers={customers}
+    customerForm={customerForm}
+    setCustomerForm={setCustomerForm}
+    handleCustomerSubmit={handleCustomerSubmit}
+    editCustomer={editCustomer} // Add this function if you haven't
+    deleteCustomer={deleteCustomer}
+    customerSearch={customerSearch} // Add this
+    setCustomerSearch={setCustomerSearch} // Add this
+    getFilteredCustomers={getFilteredCustomers} // Add this
+    generateReport={generateReport} // Add this
+  />
+)}
 
         {activeTab === 'record-management' && (
           <RecordManagementContent
