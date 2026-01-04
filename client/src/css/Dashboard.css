@@ -3087,3 +3087,29 @@ body {
     font-size: 16px;
   }
 }
+
+/* Hide ALL delete buttons in User Dashboard */
+.user-dashboard .btn-delete,
+.user-dashboard .btn-trash,
+.user-dashboard [class*="delete"],
+.user-dashboard [class*="Delete"],
+.user-dashboard button:has(svg[class*="trash"]),
+.user-dashboard button:contains("Delete"),
+.user-dashboard button:contains("Delete All") {
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+}
+
+/* Specifically hide Delete All button in records */
+.user-dashboard .btn-delete-all,
+.user-dashboard .delete-all-btn {
+  display: none !important;
+}
+/* Hide delete buttons in User Dashboard */
+.user-dashboard .btn-delete,
+.user-dashboard [class*="delete"] {
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+}
