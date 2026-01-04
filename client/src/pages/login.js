@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import axios from 'axios';
-import { useNavigate, Link } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import './../css/sign.css';
 
 import {
@@ -13,20 +13,11 @@ import {
 } from 'react-icons/fa';
 
 function Login() {
-  // Option 1: Keep individual states (RECOMMENDED for simplicity)
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-
-  // OR Option 2: Use formData object (if you prefer)
-  // const [formData, setFormData] = useState({
-  //   email: '',
-  //   password: ''
-  // });
-
-  const navigate = useNavigate();
 
   /* ================= HANDLE LOGIN ================= */
   const handleSubmit = async (e) => {
@@ -34,73 +25,53 @@ function Login() {
     setError('');
     setLoading(true);
 
-    // Validation
-    if (!email.trim()) {
-      setError('Email is required');
-      setLoading(false);
-      return;
-    }
-
-    if (!password) {
-      setError('Password is required');
-      setLoading(false);
-      return;
-    }
-
     try {
       const response = await axios.post(
         'http://localhost:5000/api/auth/login',
-        {
-          email: email, // Using the email state
-          password: password // Using the password state
-        },
-        { withCredentials: true }
+        { email, password },
+        { 
+          withCredentials: true,
+          headers: { 'Content-Type': 'application/json' }
+        }
       );
 
       if (response.data.success) {
-        // Check user role and redirect accordingly
+        console.log('✅ Login successful, role:', response.data.user?.role);
+        
+        // Force a hard redirect using window.location
         const userRole = response.data.user?.role;
-        console.log('Login successful. User role:', userRole);
         
         if (userRole === 'admin') {
-          navigate('/dashboard');  // Admin goes to Dashboard
+          window.location.href = '/dashboard';
         } else {
-          navigate('/user-dashboard');  // Employees go to UserDashboard
+          window.location.href = '/user-dashboard';
         }
+        
+        // Keep loading true during redirect
+        return;
       }
     } catch (err) {
-      if (err.response) {
-        setError(err.response.data?.error || 'Login failed');
-      } else {
-        setError('Cannot connect to server');
-      }
-    } finally {
+      console.error('❌ Login error:', err);
+      setError(err.response?.data?.error || 'Invalid email or password');
       setLoading(false);
     }
   };
 
-  /* ================= UI ================= */
   return (
     <div className="auth-page">
       <div className="auth-container">
-
-        {/* HEADER */}
         <div className="auth-header">
           <h2>Welcome Back</h2>
           <p>Login to your account to continue</p>
         </div>
 
-        {/* ERROR */}
         {error && (
           <div className="error-message">
             <span>{error}</span>
           </div>
         )}
 
-        {/* FORM */}
         <form onSubmit={handleSubmit} className="auth-form">
-
-          {/* EMAIL */}
           <div className="form-group">
             <label>
               <FaEnvelope /> Email Address
@@ -111,10 +82,10 @@ function Login() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
+              disabled={loading}
             />
           </div>
 
-          {/* PASSWORD */}
           <div className="form-group">
             <label>
               <FaLock /> Password
@@ -127,37 +98,34 @@ function Login() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
+                disabled={loading}
               />
 
               <button
                 type="button"
                 className="password-toggle"
                 onClick={() => setShowPassword(!showPassword)}
-                aria-label="Toggle password visibility"
               >
                 {showPassword ? <FaEyeSlash /> : <FaEye />}
               </button>
             </div>
           </div>
 
-          {/* FORGOT PASSWORD */}
           <div style={{ textAlign: 'center', margin: '15px 0' }}>
             <Link to="/forgot-password">
               <FaQuestionCircle /> Forgot Password?
             </Link>
           </div>
 
-          {/* SUBMIT */}
           <button
             type="submit"
             className={`auth-btn ${loading ? 'loading' : ''}`}
             disabled={loading}
           >
-            {loading ? 'Logging in...' : 'Login'}
+            {loading ? 'Redirecting...' : 'Login'}
           </button>
         </form>
 
-        {/* FOOTER */}
         <div className="auth-footer">
           <p>
             Don't have an account?{' '}
@@ -168,7 +136,6 @@ function Login() {
             <FaHome /> Back to Home
           </Link>
         </div>
-
       </div>
     </div>
   );

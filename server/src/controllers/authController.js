@@ -1,8 +1,8 @@
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
-const { authPool } = require('../config/authdb');
+const { pool } = require('../config/authdb');  // ✅ FIXED: Changed from authPool to pool
 const transporter = require('../config/email');
-
+const db = require('../config/authdb');
 const JWT_SECRET = process.env.JWT_SECRET || 'parlour_secret';
 
 /* ======================================================
@@ -23,7 +23,7 @@ exports.signup = async (req, res) => {
       return res.status(400).json({ success: false, error: 'All fields are required' });
     }
 
-    const checkUser = await authPool.query(
+    const checkUser = await pool.query(  // ✅ FIXED: Changed from authPool to pool
       'SELECT id FROM users WHERE email = $1 OR phone = $2',
       [email, phone]
     );
@@ -37,7 +37,7 @@ exports.signup = async (req, res) => {
     // Default role is 'employee' for new signups
     const role = 'employee';
 
-    const result = await authPool.query(
+    const result = await pool.query(  // ✅ FIXED: Changed from authPool to pool
       `INSERT INTO users (name, email, password, phone, role)
        VALUES ($1, $2, $3, $4, $5)
        RETURNING id, name, email, phone, role`,
@@ -74,7 +74,7 @@ exports.login = async (req, res) => {
   try {
     const { email, password } = req.body;
 
-    const result = await authPool.query(
+    const result = await pool.query(  // ✅ FIXED: Changed from authPool to pool
       'SELECT * FROM users WHERE email = $1',
       [email]
     );
@@ -143,7 +143,7 @@ exports.checkAuth = async (req, res) => {
     const decoded = jwt.verify(token, JWT_SECRET);
 
     // Get user from database including role
-    const result = await authPool.query(
+    const result = await pool.query(  // ✅ FIXED: Changed from authPool to pool
       'SELECT id, name, email, phone, role FROM users WHERE id = $1',
       [decoded.userId]
     );
@@ -193,7 +193,7 @@ exports.forgotPassword = async (req, res) => {
       return res.status(400).json({ success: false, error: 'Email is required' });
     }
 
-    const result = await authPool.query(
+    const result = await pool.query(  // ✅ FIXED: Changed from authPool to pool
       'SELECT id, name FROM users WHERE email = $1',
       [email]
     );
@@ -215,7 +215,7 @@ exports.forgotPassword = async (req, res) => {
 
     const expiry = new Date(Date.now() + 60 * 60 * 1000);
 
-    await authPool.query(
+    await pool.query(  // ✅ FIXED: Changed from authPool to pool
       `UPDATE users
        SET reset_token = $1, reset_token_expiry = $2
        WHERE id = $3`,
@@ -278,7 +278,7 @@ exports.resetPassword = async (req, res) => {
 
     const decoded = jwt.verify(token, JWT_SECRET);
 
-    const result = await authPool.query(
+    const result = await pool.query(  // ✅ FIXED: Changed from authPool to pool
       `SELECT id FROM users
        WHERE id = $1
        AND reset_token = $2
@@ -292,7 +292,7 @@ exports.resetPassword = async (req, res) => {
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    await authPool.query(
+    await pool.query(  // ✅ FIXED: Changed from authPool to pool
       `UPDATE users
        SET password = $1,
            reset_token = NULL,

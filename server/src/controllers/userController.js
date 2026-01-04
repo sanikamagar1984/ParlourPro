@@ -1,11 +1,11 @@
-const { authPool } = require('../config/authdb');
+const { query } = require('../config/authdb');
 
 // =======================
-// Get all users
+// Get all users (Admin only)
 // =======================
 exports.getAllUsers = async (req, res) => {
   try {
-    const result = await authPool.query(
+    const result = await query(
       'SELECT id, name, email, phone, role, created_at FROM users ORDER BY created_at DESC'
     );
 
@@ -24,11 +24,11 @@ exports.getAllUsers = async (req, res) => {
 };
 
 // =======================
-// Get user profile
+// Get user profile by ID
 // =======================
 exports.getUserProfile = async (req, res) => {
   try {
-    const userId = req.params.id || req.user?.userId; // ✅ FIXED
+    const userId = req.params.id;
 
     if (!userId) {
       return res.status(400).json({
@@ -37,7 +37,7 @@ exports.getUserProfile = async (req, res) => {
       });
     }
 
-    const result = await authPool.query(
+    const result = await query(
       'SELECT id, name, email, phone, role, created_at FROM users WHERE id = $1',
       [userId]
     );
@@ -64,12 +64,57 @@ exports.getUserProfile = async (req, res) => {
 };
 
 // =======================
+// Get current user (from token)
+// =======================
+exports.getCurrentUser = async (req, res) => {
+  try {
+    const userId = req.user?.userId;
+
+    if (!userId) {
+      return res.status(400).json({
+        success: false,
+        error: 'User ID not found in token'
+      });
+    }
+
+    const result = await query(
+      'SELECT id, name, email, phone, role, created_at FROM users WHERE id = $1',
+      [userId]
+    );
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({
+        success: false,
+        error: 'User not found'
+      });
+    }
+
+    res.json({
+      success: true,
+      user: result.rows[0]
+    });
+
+  } catch (error) {
+    console.error('❌ Get current user error:', error.message);
+    res.status(500).json({
+      success: false,
+      error: 'Server error'
+    });
+  }
+};
+
+// =======================
 // Update user profile
 // =======================
 exports.updateUserProfile = async (req, res) => {
   try {
-    const userId = req.params.id || req.user?.userId; // ✅ FIXED
-    const { name, phone } = req.body;
+    // Determine which ID to use: from params or from token
+    let userId;
+    if (req.params.id) {
+      userId = req.params.id;
+    } else {
+      userId = req.user?.userId;
+    }
 
     if (!userId) {
       return res.status(400).json({
@@ -78,7 +123,19 @@ exports.updateUserProfile = async (req, res) => {
       });
     }
 
-    const result = await authPool.query(
+    const { name, phone } = req.body;
+
+    // If updating another user (admin), require admin role
+    if (req.params.id && req.user?.userId !== req.params.id) {
+      if (req.user?.role !== 'admin') {
+        return res.status(403).json({
+          success: false,
+          error: 'Only admin can update other users'
+        });
+      }
+    }
+
+    const result = await query(
       `UPDATE users
        SET name = COALESCE($1, name),
            phone = COALESCE($2, phone),
