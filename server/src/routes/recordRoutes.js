@@ -15,4 +15,7 @@ router.post('/', recordController.createRecord);
 router.put('/:id', recordController.updateRecord);
 router.delete('/:id', recordController.deleteRecord);
 
+// NEW: Delete all records route
+router.delete('/all/delete-all', recordController.deleteAllRecords);
+
 module.exports = router;

@@ -58,8 +58,13 @@ export const customersAPI = {
 /* ================= RECORDS APIs ================= */
 export const recordsAPI = {
   getAll: () => api.get('/records'),
-  create: (record) => api.post('/records', record),
-  delete: (id) => api.delete(`/records/${id}`)
+  getById: (id) => api.get(`/records/${id}`),
+  create: (data) => api.post('/records', data),
+  update: (id, data) => api.put(`/records/${id}`, data),
+  delete: (id) => api.delete(`/records/${id}`),
+  deleteAll: () => api.delete('/records/all/delete-all'), // NEW
+  getStats: (params) => api.get('/records/stats/income', { params }),
+  export: (params) => api.get('/records/export', { params })
 };
 
 export default api;

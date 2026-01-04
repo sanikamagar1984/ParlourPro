@@ -20,7 +20,6 @@ exports.getAllRecords = async (req, res) => {
     let queryParams = [];
     let paramCount = 1;
     
-    // Build WHERE clause dynamically
     if (startDate && endDate) {
       whereConditions.push(`date BETWEEN $${paramCount} AND $${paramCount + 1}`);
       queryParams.push(startDate, endDate);
@@ -55,16 +54,13 @@ exports.getAllRecords = async (req, res) => {
       ? `WHERE ${whereConditions.join(' AND ')}` 
       : '';
     
-    // Calculate offset for pagination
     const offset = (page - 1) * limit;
     
-    // Get total count
     const countResult = await query(
       `SELECT COUNT(*) as total FROM daily_records ${whereClause}`,
       queryParams
     );
     
-    // Get records with pagination
     const recordsResult = await query(
       `SELECT dr.*, c.email as customer_email, c.address as customer_address
        FROM daily_records dr
@@ -75,7 +71,6 @@ exports.getAllRecords = async (req, res) => {
       [...queryParams, limit, offset]
     );
     
-    // Calculate total income
     const incomeResult = await query(
       `SELECT COALESCE(SUM(price), 0) as total_income 
        FROM daily_records ${whereClause}`,
@@ -144,161 +139,197 @@ exports.getRecordById = async (req, res) => {
 };
 
 // =======================
-// Create new record
+// Create new record - FIXED
 // =======================
 exports.createRecord = async (req, res) => {
   try {
+    console.log('📥 Received record data:', req.body);
+
+    // ✅ Accept both camelCase AND snake_case
     const {
+      customer_id,
       customerId,
+      customer_name,
       customerName,
       phone,
+      service_id,
       serviceId,
+      service_name,
       serviceName,
       category,
       price,
-      paymentMethod = 'cash',
+      payment_method,
+      paymentMethod,
       date,
       notes,
+      staff_id,
       staffId
     } = req.body;
 
+    // ✅ Use snake_case OR camelCase (whichever is provided)
+    const finalCustomerId = customer_id || customerId || null;
+    const finalCustomerName = customer_name || customerName || 'Walk-in Customer';
+    const finalPhone = phone || null;
+    const finalServiceId = service_id || serviceId;
+    const finalServiceName = service_name || serviceName;
+    const finalCategory = category;
+    const finalPrice = price;
+    const finalPaymentMethod = payment_method || paymentMethod || 'cash';
+    const finalDate = date;
+    const finalNotes = notes || null;
+    const finalStaffId = staff_id || staffId || null;
+
     // Validation
-    if (!serviceId || !price || !date) {
+    if (!finalServiceId || !finalPrice || !finalDate) {
+      console.log('❌ Validation failed:', {
+        serviceId: finalServiceId,
+        price: finalPrice,
+        date: finalDate
+      });
       return res.status(400).json({
         success: false,
         error: 'Service ID, price and date are required'
       });
     }
 
-    // Get service details
+    console.log('✅ Validation passed, inserting record...');
+
+    // Get service details if needed
     let serviceDetails = null;
-    if (serviceId) {
+    if (finalServiceId) {
       const serviceResult = await query(
         'SELECT name, category, price FROM services WHERE id = $1',
-        [serviceId]
+        [finalServiceId]
       );
       
       if (serviceResult.rows.length > 0) {
         serviceDetails = serviceResult.rows[0];
+        console.log('📋 Service details:', serviceDetails);
       }
     }
 
     // Determine final values
-    const finalServiceName = serviceName || (serviceDetails ? serviceDetails.name : 'Unknown Service');
-    const finalCategory = category || (serviceDetails ? serviceDetails.category : 'hair');
-    const finalPrice = price || (serviceDetails ? serviceDetails.price : 0);
+    const insertServiceName = finalServiceName || (serviceDetails ? serviceDetails.name : 'Unknown Service');
+    const insertCategory = finalCategory || (serviceDetails ? serviceDetails.category : 'hair');
+    const insertPrice = finalPrice || (serviceDetails ? serviceDetails.price : 0);
 
-    // Start transaction
-    const client = await query.pool.connect();
-    
-    try {
-      await client.query('BEGIN');
-      
-      // Insert the record
-      const recordResult = await client.query(
-        `INSERT INTO daily_records (
-          customer_id, customer_name, phone, 
-          service_id, service_name, category, 
-          price, payment_method, date, notes, staff_id
-        ) 
-        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11) 
-        RETURNING *`,
-        [
-          customerId || null,
-          customerName || 'Walk-in Customer',
-          phone || null,
-          serviceId || null,
-          finalServiceName,
-          finalCategory,
-          finalPrice,
-          paymentMethod,
-          date,
-          notes || null,
-          staffId || null
-        ]
+    console.log('💾 Inserting with values:', {
+      customer_id: finalCustomerId,
+      customer_name: finalCustomerName,
+      phone: finalPhone,
+      service_id: finalServiceId,
+      service_name: insertServiceName,
+      category: insertCategory,
+      price: insertPrice,
+      payment_method: finalPaymentMethod,
+      date: finalDate,
+      notes: finalNotes,
+      staff_id: finalStaffId
+    });
+
+    // Insert the record
+    const recordResult = await query(
+      `INSERT INTO daily_records (
+        customer_id, customer_name, phone, 
+        service_id, service_name, category, 
+        price, payment_method, date, notes, staff_id
+      ) 
+      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11) 
+      RETURNING *`,
+      [
+        finalCustomerId,
+        finalCustomerName,
+        finalPhone,
+        finalServiceId,
+        insertServiceName,
+        insertCategory,
+        insertPrice,
+        finalPaymentMethod,
+        finalDate,
+        finalNotes,
+        finalStaffId
+      ]
+    );
+
+    console.log('✅ Record inserted:', recordResult.rows[0]);
+
+    // Update customer stats if customer exists
+    if (finalCustomerId) {
+      await query(
+        `UPDATE customers 
+         SET total_visits = total_visits + 1,
+             total_spent = total_spent + $1,
+             updated_at = CURRENT_TIMESTAMP
+         WHERE id = $2`,
+        [insertPrice, finalCustomerId]
+      );
+      console.log('✅ Customer stats updated');
+    }
+
+    // If customer doesn't exist but name/phone provided, create new customer
+    if (!finalCustomerId && finalCustomerName && finalCustomerName !== 'Walk-in Customer' && finalPhone) {
+      const existingCustomer = await query(
+        'SELECT id FROM customers WHERE phone = $1',
+        [finalPhone]
       );
       
-      // Update customer stats if customer exists
-      if (customerId) {
-        await client.query(
+      if (existingCustomer.rows.length === 0) {
+        const newCustomer = await query(
+          `INSERT INTO customers (name, phone, total_visits, total_spent) 
+           VALUES ($1, $2, 1, $3) 
+           RETURNING id`,
+          [finalCustomerName, finalPhone, insertPrice]
+        );
+        
+        await query(
+          'UPDATE daily_records SET customer_id = $1 WHERE id = $2',
+          [newCustomer.rows[0].id, recordResult.rows[0].id]
+        );
+        console.log('✅ New customer created and linked');
+      } else {
+        await query(
           `UPDATE customers 
            SET total_visits = total_visits + 1,
                total_spent = total_spent + $1,
                updated_at = CURRENT_TIMESTAMP
            WHERE id = $2`,
-          [finalPrice, customerId]
-        );
-      }
-      
-      // If customer doesn't exist but name/phone provided, create new customer
-      if (!customerId && customerName && customerName !== 'Walk-in Customer' && phone) {
-        // Check if customer already exists with this phone
-        const existingCustomer = await client.query(
-          'SELECT id FROM customers WHERE phone = $1',
-          [phone]
+          [insertPrice, existingCustomer.rows[0].id]
         );
         
-        if (existingCustomer.rows.length === 0) {
-          // Create new customer
-          const newCustomer = await client.query(
-            `INSERT INTO customers (name, phone, total_visits, total_spent) 
-             VALUES ($1, $2, 1, $3) 
-             RETURNING id`,
-            [customerName, phone, finalPrice]
-          );
-          
-          // Update record with new customer ID
-          await client.query(
-            'UPDATE daily_records SET customer_id = $1 WHERE id = $2',
-            [newCustomer.rows[0].id, recordResult.rows[0].id]
-          );
-        } else {
-          // Customer exists, update their record
-          await client.query(
-            `UPDATE customers 
-             SET total_visits = total_visits + 1,
-                 total_spent = total_spent + $1,
-                 updated_at = CURRENT_TIMESTAMP
-             WHERE id = $2`,
-            [finalPrice, existingCustomer.rows[0].id]
-          );
-          
-          // Update record with existing customer ID
-          await client.query(
-            'UPDATE daily_records SET customer_id = $1 WHERE id = $2',
-            [existingCustomer.rows[0].id, recordResult.rows[0].id]
-          );
-        }
+        await query(
+          'UPDATE daily_records SET customer_id = $1 WHERE id = $2',
+          [existingCustomer.rows[0].id, recordResult.rows[0].id]
+        );
+        console.log('✅ Existing customer updated and linked');
       }
-      
-      await client.query('COMMIT');
-      
-      // Get the full record with customer details
-      const fullRecordResult = await query(
-        `SELECT dr.*, c.email as customer_email 
-         FROM daily_records dr
-         LEFT JOIN customers c ON dr.customer_id = c.id
-         WHERE dr.id = $1`,
-        [recordResult.rows[0].id]
-      );
-      
-      res.status(201).json({
-        success: true,
-        message: 'Record created successfully',
-        record: fullRecordResult.rows[0]
-      });
-      
-    } catch (error) {
-      await client.query('ROLLBACK');
-      throw error;
-    } finally {
-      client.release();
     }
+
+    // Get the full record with customer details
+    const fullRecordResult = await query(
+      `SELECT dr.*, c.email as customer_email 
+       FROM daily_records dr
+       LEFT JOIN customers c ON dr.customer_id = c.id
+       WHERE dr.id = $1`,
+      [recordResult.rows[0].id]
+    );
+    
+    console.log('✅ Record created successfully');
+    
+    res.status(201).json({
+      success: true,
+      message: 'Record created successfully',
+      record: fullRecordResult.rows[0]
+    });
     
   } catch (error) {
-    console.error('❌ Create record error:', error.message);
+    console.error('❌ Create record error:', error);
+    console.error('Error details:', {
+      message: error.message,
+      code: error.code,
+      detail: error.detail
+    });
     
-    if (error.code === '23503') { // Foreign key violation
+    if (error.code === '23503') {
       return res.status(400).json({
         success: false,
         error: 'Invalid service or customer ID'
@@ -307,7 +338,7 @@ exports.createRecord = async (req, res) => {
     
     res.status(500).json({
       success: false,
-      error: 'Server error'
+      error: 'Server error: ' + error.message
     });
   }
 };
@@ -320,7 +351,6 @@ exports.updateRecord = async (req, res) => {
     const { id } = req.params;
     const updates = req.body;
     
-    // Check if record exists
     const checkResult = await query(
       'SELECT customer_id, price FROM daily_records WHERE id = $1',
       [id]
@@ -335,12 +365,10 @@ exports.updateRecord = async (req, res) => {
 
     const oldRecord = checkResult.rows[0];
     
-    // Build dynamic update query
     const updateFields = [];
     const updateValues = [];
     let paramCount = 1;
     
-    // Add updatable fields
     const updatableFields = [
       'customer_id', 'customer_name', 'phone',
       'service_id', 'service_name', 'category',
@@ -362,7 +390,6 @@ exports.updateRecord = async (req, res) => {
       });
     }
     
-    // Add ID as last parameter
     updateValues.push(id);
     
     const updateQuery = `
@@ -374,7 +401,6 @@ exports.updateRecord = async (req, res) => {
     
     const result = await query(updateQuery, updateValues);
     
-    // If customer_id or price changed, update customer stats
     if (updates.price && updates.price !== oldRecord.price) {
       const priceDiff = updates.price - oldRecord.price;
       
@@ -411,7 +437,6 @@ exports.deleteRecord = async (req, res) => {
   try {
     const { id } = req.params;
 
-    // Get record details before deletion
     const recordResult = await query(
       'SELECT customer_id, price FROM daily_records WHERE id = $1',
       [id]
@@ -426,43 +451,59 @@ exports.deleteRecord = async (req, res) => {
 
     const record = recordResult.rows[0];
     
-    // Start transaction
-    const client = await query.pool.connect();
+    await query('DELETE FROM daily_records WHERE id = $1', [id]);
     
-    try {
-      await client.query('BEGIN');
-      
-      // Delete the record
-      await client.query('DELETE FROM daily_records WHERE id = $1', [id]);
-      
-      // Update customer stats if customer exists
-      if (record.customer_id) {
-        await client.query(
-          `UPDATE customers 
-           SET total_visits = total_visits - 1,
-               total_spent = total_spent - $1,
-               updated_at = CURRENT_TIMESTAMP
-           WHERE id = $2`,
-          [record.price, record.customer_id]
-        );
-      }
-      
-      await client.query('COMMIT');
-      
-      res.json({
-        success: true,
-        message: 'Record deleted successfully'
-      });
-      
-    } catch (error) {
-      await client.query('ROLLBACK');
-      throw error;
-    } finally {
-      client.release();
+    if (record.customer_id) {
+      await query(
+        `UPDATE customers 
+         SET total_visits = total_visits - 1,
+             total_spent = total_spent - $1,
+             updated_at = CURRENT_TIMESTAMP
+         WHERE id = $2`,
+        [record.price, record.customer_id]
+      );
     }
+    
+    res.json({
+      success: true,
+      message: 'Record deleted successfully'
+    });
     
   } catch (error) {
     console.error('❌ Delete record error:', error.message);
+    res.status(500).json({
+      success: false,
+      error: 'Server error'
+    });
+  }
+};
+
+// =======================
+// Delete ALL records - NEW
+// =======================
+exports.deleteAllRecords = async (req, res) => {
+  try {
+    console.log('⚠️ DELETE ALL RECORDS requested');
+    
+    // Get all records before deletion to update customer stats
+    const allRecords = await query('SELECT customer_id, price FROM daily_records WHERE customer_id IS NOT NULL');
+    
+    // Delete all records
+    await query('DELETE FROM daily_records');
+    
+    // Reset all customer stats
+    await query('UPDATE customers SET total_visits = 0, total_spent = 0, updated_at = CURRENT_TIMESTAMP');
+    
+    console.log('✅ All records deleted successfully');
+    
+    res.json({
+      success: true,
+      message: 'All records deleted successfully',
+      deletedCount: allRecords.rows.length
+    });
+    
+  } catch (error) {
+    console.error('❌ Delete all records error:', error.message);
     res.status(500).json({
       success: false,
       error: 'Server error'
@@ -527,7 +568,6 @@ exports.getIncomeStats = async (req, res) => {
       params
     );
     
-    // Calculate summary
     const summary = {
       totalRecords: result.rows.reduce((sum, row) => sum + parseInt(row.records_count), 0),
       totalIncome: result.rows.reduce((sum, row) => sum + parseFloat(row.total_income), 0),
@@ -552,7 +592,7 @@ exports.getIncomeStats = async (req, res) => {
 };
 
 // =======================
-// Export records to CSV/Excel data
+// Export records
 // =======================
 exports.exportRecords = async (req, res) => {
   try {
@@ -593,7 +633,6 @@ exports.exportRecords = async (req, res) => {
       params
     );
     
-    // Calculate totals
     const totals = {
       totalRecords: result.rows.length,
       totalIncome: result.rows.reduce((sum, row) => sum + parseFloat(row.price), 0),
@@ -601,7 +640,6 @@ exports.exportRecords = async (req, res) => {
     };
     
     if (format === 'csv') {
-      // Prepare CSV data
       const headers = ['ID', 'Date', 'Customer Name', 'Phone', 'Email', 'Service', 'Category', 'Price', 'Payment Method', 'Notes'];
       const csvRows = result.rows.map(row => [
         row.id,
@@ -621,7 +659,6 @@ exports.exportRecords = async (req, res) => {
         ...csvRows.map(row => row.map(cell => `"${cell}"`).join(','))
       ].join('\n');
       
-      // Add totals row
       const totalsRow = `\n\nTOTALS:,${totals.totalRecords} records,Total Income:,${totals.totalIncome},Date Range:,${totals.dateRange}`;
       
       res.setHeader('Content-Type', 'text/csv');
@@ -629,7 +666,6 @@ exports.exportRecords = async (req, res) => {
       res.send(csvContent + totalsRow);
       
     } else {
-      // Return JSON data
       res.json({
         success: true,
         totals: totals,
