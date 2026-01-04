@@ -1,5 +1,5 @@
 import React from 'react';
-import { FaMoneyBillWave, FaUsers, FaUserTie, FaCut, FaClipboardList, FaUserFriends, FaHistory } from 'react-icons/fa';
+import { FaMoneyBillWave, FaUsers, FaUserTie, FaCut, FaClipboardList, FaHistory } from 'react-icons/fa';
 
 function DashboardContent({ user, stats, setActiveTab }) {
   
@@ -77,12 +77,6 @@ function DashboardContent({ user, stats, setActiveTab }) {
             onClick={() => setActiveTab('manage-services')}
           >
             <FaClipboardList /> Manage Services
-          </button>
-          <button 
-            className="action-btn"
-            onClick={() => setActiveTab('staff-management')}
-          >
-            <FaUserFriends /> Staff Management
           </button>
           <button 
             className="action-btn"

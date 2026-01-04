@@ -1,5 +1,5 @@
 import React from 'react';
-import { FaTimes, FaChartLine, FaClipboardList, FaUserFriends, FaUsers, FaHistory, FaSignOutAlt, FaUserCircle } from 'react-icons/fa';
+import { FaTimes, FaChartLine, FaClipboardList, FaUsers, FaHistory, FaSignOutAlt, FaUserCircle } from 'react-icons/fa';
 
 const Sidebar = ({ 
   sidebarOpen, 
@@ -43,13 +43,6 @@ const Sidebar = ({
         <li className={activeTab === 'manage-services' ? 'active' : ''} onClick={() => {setActiveTab('manage-services'); setMobileSidebarOpen(false);}}>
           <FaClipboardList /> <span>Manage Services</span>
         </li>
-        
-        {/* ✅ FIXED: Hide Staff Management for employees */}
-        {!isUserDashboard && (
-          <li className={activeTab === 'staff-management' ? 'active' : ''} onClick={() => {setActiveTab('staff-management'); setMobileSidebarOpen(false);}}>
-            <FaUserFriends /> <span>Staff Management</span>
-          </li>
-        )}
         
         <li className={activeTab === 'customer-management' ? 'active' : ''} onClick={() => {setActiveTab('customer-management'); setMobileSidebarOpen(false);}}>
           <FaUsers /> <span>Customer Management</span>

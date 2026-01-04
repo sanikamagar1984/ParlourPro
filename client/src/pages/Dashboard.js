@@ -9,7 +9,6 @@ import { FaFilePdf, FaTimes } from 'react-icons/fa';
 
 import {
   servicesAPI,
-  staffAPI,
   customersAPI,
   recordsAPI
 } from '../services/api';
@@ -18,7 +17,6 @@ import {
 import Sidebar from '../components/Dashboard/Sidebar';
 import DashboardContent from '../components/Dashboard/DashboardContent';
 import ManageServicesContent from '../components/Dashboard/ManageServicesContent';
-import StaffManagementContent from '../components/Dashboard/StaffManagementContent';
 import CustomerManagementContent from '../components/Dashboard/CustomerManagementContent';
 import RecordManagementContent from '../components/Dashboard/RecordManagementContent';
 
@@ -66,7 +64,6 @@ function Dashboard() {
   const [skinServices, setSkinServices] = useState([]);
   const [tattooServices, setTattooServices] = useState([]);
   const [piercingServices, setPiercingServices] = useState([]);
-  const [staff, setStaff] = useState([]);
   const [customers, setCustomers] = useState([]);
   const [dailyRecords, setDailyRecords] = useState([]);
 
@@ -76,7 +73,6 @@ function Dashboard() {
     weeklyIncome: 0,
     monthlyIncome: 0,
     totalCustomers: 0,
-    totalStaff: 0,
     totalServices: 0,
     todayAppointments: 0
   });
@@ -1283,7 +1279,6 @@ function Dashboard() {
       weeklyIncome,
       monthlyIncome,
       totalCustomers: customers.length,
-      totalStaff: staff.length,
       totalServices:
         hairServices.length +
         skinServices.length +
@@ -1294,7 +1289,6 @@ function Dashboard() {
   }, [
     dailyRecords,
     customers,
-    staff,
     hairServices,
     skinServices,
     tattooServices,
@@ -1383,15 +1377,6 @@ function Dashboard() {
               downloadServicesExcel={downloadServicesExcel}
               downloadServicesPDF={downloadServicesPDF}
               downloadServicesCSV={downloadServicesCSV}
-            />
-          )}
-
-          {activeTab === 'staff-management' && (
-            <StaffManagementContent
-              staff={staff}
-              updateEmployee={updateEmployee}
-              updateEmployeePassword={updateEmployeePassword}
-              deleteEmployee={deleteEmployee}
             />
           )}
 
