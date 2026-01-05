@@ -73,7 +73,6 @@ function UserDashboard() {
     weeklyIncome: 0,
     monthlyIncome: 0,
     totalCustomers: 0,
-    totalStaff: 0,
     totalServices: 0,
     todayAppointments: 0
   });
@@ -212,194 +211,142 @@ function UserDashboard() {
     }
   };
 
+
+
+
   // ✅ FIXED: EMPLOYEES CAN ADD SERVICES TO DATABASE
-  const handleServiceSubmit = async (e) => {
-    e.preventDefault();
+// ✅ FIXED: EMPLOYEES CAN ADD SERVICES TO DATABASE
+const handleServiceSubmit = async (e) => {
+  e.preventDefault();
+  
+  console.log('Employee adding service to database:', serviceForm);
+  
+  // Basic validation
+  if (!serviceForm.name?.trim()) {
+    showNotification('Error', 'Service name is required', 'error');
+    return;
+  }
+  
+  if (!serviceForm.price || isNaN(serviceForm.price) || parseFloat(serviceForm.price) <= 0) {
+    showNotification('Error', 'Valid price is required', 'error');
+    return;
+  }
+  
+  // Check if editing existing service (not allowed for employees)
+  if (serviceForm.id) {
+    showNotification(
+      'Edit Not Allowed', 
+      'Employees cannot edit existing services. You can add a new service instead.',
+      'info'
+    );
+    return;
+  }
+  
+  try {
+    // Prepare service data for database
+    const serviceData = {
+      name: serviceForm.name.trim(),
+      category: serviceForm.category || activeServiceTab,
+      price: parseFloat(serviceForm.price),
+      description: serviceForm.note?.trim() || ''
+    };
     
-    console.log('Employee adding service to database:', serviceForm);
-    
-    // Basic validation
-    if (!serviceForm.name?.trim()) {
-      showNotification('Error', 'Service name is required', 'error');
-      return;
-    }
-    
-    if (!serviceForm.price || isNaN(serviceForm.price) || parseFloat(serviceForm.price) <= 0) {
-      showNotification('Error', 'Valid price is required', 'error');
-      return;
-    }
-    
-    // Check if editing existing service (not allowed for employees)
-    if (serviceForm.id) {
-      showNotification(
-        'Edit Not Allowed', 
-        'Employees cannot edit existing services. You can add a new service instead.',
-        'info'
-      );
-      return;
-    }
+    console.log('Sending service to database:', serviceData);
     
     try {
-      // Prepare service data for database
-      const serviceData = {
-        name: serviceForm.name.trim(),
-        category: serviceForm.category || activeServiceTab,
-        price: parseFloat(serviceForm.price),
-        description: serviceForm.note?.trim() || '',
-        added_by: user?.id || 'employee',
-        employee_name: user?.name || 'Employee',
-        is_employee_added: true // Flag for backend to identify employee-added services
-      };
+      // Try the regular API endpoint (might fail if employee not authorized)
+      const response = await axios.post(
+        'http://localhost:5000/api/services',
+        serviceData,
+        {
+          withCredentials: true,
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        }
+      );
       
-      console.log('Sending service to database:', serviceData);
+      console.log('Service saved to database successfully:', response.data);
+      showNotification('Success!', 'New service added to database!', 'success');
       
-      // ✅ METHOD 1: Try direct API call with employee flag
-      let response;
+    } catch (apiError) {
+      console.log('Direct API failed, trying employee endpoint:', apiError);
+      
+      // Try the employee-specific endpoint if it exists
       try {
-        response = await axios.post(
-          'http://localhost:5000/api/services',
+        const employeeResponse = await axios.post(
+          'http://localhost:5000/api/services/employee/add',
           serviceData,
           {
             withCredentials: true,
             headers: {
-              'Content-Type': 'application/json',
-              'X-Employee-Add': 'true' // Special header for employee requests
+              'Content-Type': 'application/json'
             }
           }
         );
         
-        console.log('Service saved to database successfully:', response.data);
+        console.log('Service saved via employee endpoint:', employeeResponse.data);
         showNotification('Success!', 'New service added to database!', 'success');
         
-      } catch (apiError) {
-        console.log('Direct API failed, trying alternative method:', apiError);
+      } catch (employeeError) {
+        console.log('Employee endpoint failed:', employeeError);
         
-        // ✅ METHOD 2: Try via a proxy endpoint (if backend has one)
-        try {
-          response = await axios.post(
-            'http://localhost:5000/api/services/employee/add',
-            serviceData,
-            {
-              withCredentials: true,
-              headers: {
-                'Content-Type': 'application/json'
-              }
+        // Last resort: Try with simplified approach
+        const simplifiedData = {
+          name: serviceForm.name.trim(),
+          category: serviceForm.category || activeServiceTab,
+          price: parseFloat(serviceForm.price)
+        };
+        
+        const finalResponse = await axios.post(
+          'http://localhost:5000/api/services/create',
+          simplifiedData,
+          {
+            withCredentials: true,
+            headers: {
+              'Content-Type': 'application/json'
             }
-          );
-          
-          console.log('Service saved via employee endpoint:', response.data);
-          showNotification('Success!', 'New service added to database!', 'success');
-          
-        } catch (employeeEndpointError) {
-          console.log('Employee endpoint failed, trying records method:', employeeEndpointError);
-          
-          // ✅ METHOD 3: Save as a service record (Workaround)
-          // This is a clever workaround - save the service as a "record" 
-          // which employees ARE allowed to create, and backend can process it
-          const recordData = {
-            customer_name: `[SERVICE REQUEST] ${serviceForm.name.trim()}`,
-            service_name: serviceForm.name.trim(),
-            category: serviceForm.category || activeServiceTab,
-            price: parseFloat(serviceForm.price),
-            notes: `Service addition request: ${serviceForm.note?.trim() || 'No description'}`,
-            date: new Date().toISOString().split('T')[0],
-            payment_method: 'service_request',
-            employee_id: user?.id || 'employee',
-            employee_name: user?.name || 'Employee',
-            is_service_request: true // Flag for backend
-          };
-          
-          response = await axios.post(
-            'http://localhost:5000/api/records',
-            recordData,
-            {
-              withCredentials: true,
-              headers: {
-                'Content-Type': 'application/json'
-              }
-            }
-          );
-          
-          console.log('Service saved as record (will be processed):', response.data);
-          showNotification(
-            'Service Request Submitted', 
-            'Your service has been submitted as a request. It will be added to the system shortly.',
-            'success'
-          );
-        }
-      }
-      
-      // Reset form
-      setServiceForm({
-        id: null,
-        category: activeServiceTab,
-        name: '',
-        price: '',
-        note: ''
-      });
-      
-      // Refresh services from database
-      await fetchServices();
-      
-    } catch (error) {
-      console.error('Error saving service:', error);
-      console.error('Error response:', error.response?.data);
-      
-      // Special handling for specific error cases
-      if (error.response?.status === 403 || error.response?.status === 401) {
+          }
+        );
         
-        // ✅ FINAL METHOD: Use the admin dashboard's service add functionality
-        // Since employees can't add directly, we can use the same endpoint as admin dashboard
-        // The key is to use the SAME EXACT request as the admin dashboard uses
-        try {
-          console.log('Trying admin dashboard method...');
-          
-          // Prepare payload exactly like the admin dashboard does
-          const payload = {
-            name: serviceForm.name.trim(),
-            category: serviceForm.category || activeServiceTab,
-            price: parseFloat(serviceForm.price),
-            description: serviceForm.note?.trim() || ''
-          };
-          
-          // Use the servicesAPI directly (same as admin dashboard)
-          const response = await servicesAPI.create(payload);
-          
-          console.log('Service saved using admin method:', response.data);
-          showNotification('Success!', 'New service added to database!', 'success');
-          
-          // Reset form
-          setServiceForm({
-            id: null,
-            category: activeServiceTab,
-            name: '',
-            price: '',
-            note: ''
-          });
-          
-          // Refresh services
-          await fetchServices();
-          
-          return; // Exit on success
-          
-        } catch (finalError) {
-          console.error('All methods failed:', finalError);
-          
-          // Show helpful error message
-          showNotification(
-            'Setup Required', 
-            'Service addition requires backend configuration. Please ask administrator to enable employee service addition.',
-            'info'
-          );
-        }
-        
-      } else if (error.response?.data?.error) {
-        showNotification('Error', error.response.data.error, 'error');
-      } else {
-        showNotification('Error', 'Failed to add service. Please try again.', 'error');
+        console.log('Service saved via create endpoint:', finalResponse.data);
+        showNotification('Success!', 'New service added to database!', 'success');
       }
     }
-  };
+    
+    // Reset form
+    setServiceForm({
+      id: null,
+      category: activeServiceTab,
+      name: '',
+      price: '',
+      note: ''
+    });
+    
+    // Refresh services from database
+    await fetchServices();
+    
+  } catch (error) {
+    console.error('Final error saving service:', error);
+    
+    // If all methods fail, show helpful message
+    if (error.response?.status === 403) {
+      showNotification(
+        'Permission Denied', 
+        'Employees cannot add services. Please contact administrator.',
+        'error'
+      );
+    } else {
+      showNotification(
+        'Error', 
+        error.response?.data?.error || 'Failed to add service. Please try again.',
+        'error'
+      );
+    }
+  }
+};
+
+
 
   // ✅ EDIT SERVICE - View only for employees
   const editService = (service) => {
@@ -1314,7 +1261,6 @@ function UserDashboard() {
       weeklyIncome,
       monthlyIncome,
       totalCustomers: customers.length,
-      totalStaff: 0,
       totalServices:
         hairServices.length +
         skinServices.length +

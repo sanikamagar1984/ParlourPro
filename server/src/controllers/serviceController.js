@@ -243,3 +243,56 @@ exports.searchServices = async (req, res) => {
     });
   }
 };
+
+// =======================
+// Create service for employees
+// =======================
+exports.createServiceEmployee = async (req, res) => {
+  try {
+    const { name, category, price, description } = req.body;
+    const employeeId = req.user.id;
+    const employeeName = req.user.name || 'Employee';
+
+    // Validation
+    if (!name || !category || !price) {
+      return res.status(400).json({
+        success: false,
+        error: 'Name, category and price are required'
+      });
+    }
+
+    const result = await query(
+      `INSERT INTO services (name, category, price, description, added_by, employee_name) 
+       VALUES ($1, $2, $3, $4, $5, $6) 
+       RETURNING *`,
+      [
+        name, 
+        category, 
+        price, 
+        description || null,
+        employeeId,
+        employeeName
+      ]
+    );
+
+    res.status(201).json({
+      success: true,
+      message: 'Service added successfully by employee',
+      service: result.rows[0]
+    });
+  } catch (error) {
+    console.error('❌ Employee create service error:', error.message);
+    
+    if (error.code === '23505') { // Unique violation
+      return res.status(400).json({
+        success: false,
+        error: 'Service with this name already exists'
+      });
+    }
+    
+    res.status(500).json({
+      success: false,
+      error: 'Server error'
+    });
+  }
+};

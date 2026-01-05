@@ -1,5 +1,5 @@
 import React from 'react';
-import { FaTimes, FaChartLine, FaClipboardList, FaUsers, FaHistory, FaSignOutAlt, FaUserCircle } from 'react-icons/fa';
+import { FaTimes, FaChartLine, FaClipboardList, FaUsers, FaHistory, FaSignOutAlt, FaUserCircle, FaUserFriends } from 'react-icons/fa'; // Added FaUserFriends
 
 const Sidebar = ({ 
   sidebarOpen, 
@@ -9,13 +9,12 @@ const Sidebar = ({
   setActiveTab, 
   setMobileSidebarOpen, 
   handleLogout,
-  isUserDashboard = false // NEW PROP
+  isUserDashboard = false
 }) => (
   <aside className={`sidebar ${sidebarOpen ? 'open' : 'closed'} ${mobileSidebarOpen ? 'mobile-open' : ''}`}>
     <div className="sidebar-header">
       <div className="logo-container">
         <h2>ParlourPro</h2>
-        {/* ✅ FIXED: Show different text based on user role */}
         <p>{isUserDashboard ? 'Employee Panel' : 'Admin Panel'}</p>
       </div>
       <button className="mobile-close" onClick={() => setMobileSidebarOpen(false)}>
@@ -29,7 +28,6 @@ const Sidebar = ({
       </div>
       <div className="user-details">
         <h4>{user?.name || 'User'}</h4>
-        {/* ✅ FIXED: Show "Employee" instead of role */}
         <p>{isUserDashboard ? 'Employee' : (user?.role || 'Admin')}</p>
         <p className="user-email">{user?.email || 'user@parlour.com'}</p>
       </div>
@@ -43,6 +41,12 @@ const Sidebar = ({
         <li className={activeTab === 'manage-services' ? 'active' : ''} onClick={() => {setActiveTab('manage-services'); setMobileSidebarOpen(false);}}>
           <FaClipboardList /> <span>Manage Services</span>
         </li>
+        
+        {/* ✅ ADD STAFF MANAGEMENT MENU ITEM HERE */}
+        <li className={activeTab === 'staff-management' ? 'active' : ''} onClick={() => {setActiveTab('staff-management'); setMobileSidebarOpen(false);}}>
+          <FaUserFriends /> <span>Staff Management</span>
+        </li>
+        {/* END OF ADDITION */}
         
         <li className={activeTab === 'customer-management' ? 'active' : ''} onClick={() => {setActiveTab('customer-management'); setMobileSidebarOpen(false);}}>
           <FaUsers /> <span>Customer Management</span>

@@ -9,6 +9,7 @@ import { FaFilePdf, FaTimes } from 'react-icons/fa';
 
 import {
   servicesAPI,
+  staffAPI,
   customersAPI,
   recordsAPI
 } from '../services/api';
@@ -17,6 +18,7 @@ import {
 import Sidebar from '../components/Dashboard/Sidebar';
 import DashboardContent from '../components/Dashboard/DashboardContent';
 import ManageServicesContent from '../components/Dashboard/ManageServicesContent';
+import StaffManagementContent from '../components/Dashboard/StaffManagementContent';
 import CustomerManagementContent from '../components/Dashboard/CustomerManagementContent';
 import RecordManagementContent from '../components/Dashboard/RecordManagementContent';
 
@@ -25,7 +27,7 @@ import './../css/Dashboard.css';
 function Dashboard() {
   const navigate = useNavigate();
 
-  // ✅ Helper function to format date as YYYY-MM-DD
+  // âœ… Helper function to format date as YYYY-MM-DD
   const getLocalDateString = (date) => {
     const d = new Date(date);
     const year = d.getFullYear();
@@ -34,7 +36,7 @@ function Dashboard() {
     return `${year}-${month}-${day}`;
   };
 
-  // ✅ Format date to DD-MM-YYYY for display
+  // âœ… Format date to DD-MM-YYYY for display
   const formatDateToDDMMYYYY = (dateString) => {
     if (!dateString) return '';
     
@@ -64,6 +66,7 @@ function Dashboard() {
   const [skinServices, setSkinServices] = useState([]);
   const [tattooServices, setTattooServices] = useState([]);
   const [piercingServices, setPiercingServices] = useState([]);
+  const [staff, setStaff] = useState([]);
   const [customers, setCustomers] = useState([]);
   const [dailyRecords, setDailyRecords] = useState([]);
 
@@ -73,6 +76,7 @@ function Dashboard() {
     weeklyIncome: 0,
     monthlyIncome: 0,
     totalCustomers: 0,
+    totalStaff: 0,
     totalServices: 0,
     todayAppointments: 0
   });
@@ -407,7 +411,7 @@ function Dashboard() {
     doc.setFontSize(9);
     doc.setTextColor(120);
     doc.text(
-      '© Tressence by Simi | Premium Beauty & Care',
+      'Â© Tressence by Simi | Premium Beauty & Care',
       14,
       pageHeight - 12
     );
@@ -686,7 +690,7 @@ function Dashboard() {
     doc.setTextColor(120);
     doc.setFont('helvetica', 'italic');
     doc.text(
-      '© Tressence by Simi | Luxury Beauty Salon',
+      'Â© Tressence by Simi | Luxury Beauty Salon',
       14,
       finalY + 10
     );
@@ -773,7 +777,7 @@ function Dashboard() {
     return [...hairServices, ...skinServices, ...tattooServices, ...piercingServices];
   };
 
-  // ✅ FIXED: Handle record submit with proper date handling
+  // âœ… FIXED: Handle record submit with proper date handling
   const handleRecordSubmit = async (e) => {
     e.preventDefault();
     
@@ -909,7 +913,7 @@ function Dashboard() {
 
   // Delete all records
   const deleteAllRecords = async () => {
-    if (!window.confirm('⚠️ WARNING: This will permanently delete ALL records from the database. This action cannot be undone. Are you sure?')) {
+    if (!window.confirm('âš ï¸ WARNING: This will permanently delete ALL records from the database. This action cannot be undone. Are you sure?')) {
       return;
     }
     
@@ -927,13 +931,13 @@ function Dashboard() {
     }
   };
 
-  // ✅ Calculate total income from filtered records
+  // âœ… Calculate total income from filtered records
   const calculateIncome = () => {
     const filteredRecords = getFilteredRecords();
     return filteredRecords.reduce((total, record) => total + parseFloat(record.price || 0), 0);
   };
 
-  // ✅ Export functions for records
+  // âœ… Export functions for records
   const exportToCSV = (data, filename) => {
     const filteredRecords = getFilteredRecords();
     const totalIncome = calculateIncome();
@@ -1279,6 +1283,7 @@ function Dashboard() {
       weeklyIncome,
       monthlyIncome,
       totalCustomers: customers.length,
+      totalStaff: staff.length,
       totalServices:
         hairServices.length +
         skinServices.length +
@@ -1289,6 +1294,7 @@ function Dashboard() {
   }, [
     dailyRecords,
     customers,
+    staff,
     hairServices,
     skinServices,
     tattooServices,
@@ -1325,9 +1331,9 @@ function Dashboard() {
         <div className={`notification ${notification.type}`}>
           <div className="notification-content">
             <div className="notification-icon">
-              {notification.type === 'success' && '✓'}
-              {notification.type === 'error' && '✕'}
-              {notification.type === 'info' && 'ℹ'}
+              {notification.type === 'success' && 'âœ“'}
+              {notification.type === 'error' && 'âœ•'}
+              {notification.type === 'info' && 'â„¹'}
             </div>
             <div className="notification-details">
               <h4>{notification.title}</h4>
@@ -1377,6 +1383,15 @@ function Dashboard() {
               downloadServicesExcel={downloadServicesExcel}
               downloadServicesPDF={downloadServicesPDF}
               downloadServicesCSV={downloadServicesCSV}
+            />
+          )}
+
+          {activeTab === 'staff-management' && (
+            <StaffManagementContent
+              staff={staff}
+              updateEmployee={updateEmployee}
+              updateEmployeePassword={updateEmployeePassword}
+              deleteEmployee={deleteEmployee}
             />
           )}
 

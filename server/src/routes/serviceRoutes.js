@@ -10,7 +10,7 @@ router.get('/search', serviceController.searchServices);
 router.get('/:id', serviceController.getServiceById);
 
 // Protected routes (admin only)
-router.post('/', authenticate, authorize(['admin']), serviceController.createService);
+router.post('/', authenticate, authorize(['admin', 'employee']), serviceController.createService);
 router.put('/:id', authenticate, authorize(['admin']), serviceController.updateService);
 router.delete('/:id', authenticate, authorize(['admin']), serviceController.deleteService);
 
