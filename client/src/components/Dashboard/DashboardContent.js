@@ -69,29 +69,7 @@ function DashboardContent({ user, stats, setActiveTab }) {
       </div>
 
       {/* Quick Actions */}
-      <div className="quick-actions">
-        <h2>Quick Actions</h2>
-        <div className="action-buttons">
-          <button 
-            className="action-btn"
-            onClick={() => setActiveTab('manage-services')}
-          >
-            <FaClipboardList /> Manage Services
-          </button>
-          <button 
-            className="action-btn"
-            onClick={() => setActiveTab('customer-management')}
-          >
-            <FaUsers /> Customer Management
-          </button>
-          <button 
-            className="action-btn"
-            onClick={() => setActiveTab('record-management')}
-          >
-            <FaHistory /> View All Records
-          </button>
-        </div>
-      </div>
+     
     </div>
   );
 }

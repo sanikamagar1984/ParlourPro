@@ -1,11 +1,11 @@
 // client/src/pages/Dashboard.js
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import * as XLSX from 'xlsx';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
-import { FaFilePdf, FaTimes } from 'react-icons/fa';
+import { FaTimes } from 'react-icons/fa';
 
 import {
   servicesAPI,
@@ -26,8 +26,8 @@ import './../css/Dashboard.css';
 
 function Dashboard() {
   const navigate = useNavigate();
-
-  // âœ… Helper function to format date as YYYY-MM-DD
+  
+  // Helper function to format date as YYYY-MM-DD
   const getLocalDateString = (date) => {
     const d = new Date(date);
     const year = d.getFullYear();
@@ -36,7 +36,7 @@ function Dashboard() {
     return `${year}-${month}-${day}`;
   };
 
-  // âœ… Format date to DD-MM-YYYY for display
+  // Format date to DD-MM-YYYY for display
   const formatDateToDDMMYYYY = (dateString) => {
     if (!dateString) return '';
     
@@ -137,6 +137,18 @@ function Dashboard() {
   const closeNotification = () =>
     setNotification(p => ({ ...p, show: false }));
 
+  /* ================= LOAD ALL DATA ================= */
+  const loadAllData = useCallback(async () => {
+    try {
+      await fetchServices();
+      await fetchStaff();
+      await fetchCustomers();
+      await fetchRecords();
+    } catch (error) {
+      console.error('Error loading data:', error);
+    }
+  }, []);
+
   /* ================= AUTH ================= */
   useEffect(() => {
     let isMounted = true;
@@ -185,19 +197,7 @@ function Dashboard() {
     return () => {
       isMounted = false;
     };
-  }, []);
-
-  /* ================= LOAD ALL DATA ================= */
-  const loadAllData = async () => {
-    try {
-      await fetchServices();
-      await fetchStaff();
-      await fetchCustomers();
-      await fetchRecords();
-    } catch (error) {
-      console.error('Error loading data:', error);
-    }
-  };
+  }, [loadAllData]);
 
   /* ================= SERVICES ================= */
   const fetchServices = async () => {
@@ -228,11 +228,11 @@ function Dashboard() {
 
       if (serviceForm.id) {
         await servicesAPI.update(serviceForm.id, payload);
+        showNotification('Success', 'Service updated successfully');
       } else {
         await servicesAPI.create(payload);
+        showNotification('Success', 'Service added successfully');
       }
-
-      showNotification('Success', 'Service saved');
 
       setServiceForm({
         id: null,
@@ -411,7 +411,7 @@ function Dashboard() {
     doc.setFontSize(9);
     doc.setTextColor(120);
     doc.text(
-      'Â© Tressence by Simi | Premium Beauty & Care',
+      '© Tressence by Simi | Premium Beauty & Care',
       14,
       pageHeight - 12
     );
@@ -491,13 +491,14 @@ function Dashboard() {
     try {
       if (customerForm.id) {
         await customersAPI.update(customerForm.id, customerForm);
+        showNotification('Success', 'Customer updated');
       } else {
         await customersAPI.create(customerForm);
+        showNotification('Success', 'Customer added');
       }
 
       setCustomerForm({ id: null, name: '', phone: '', email: '', address: '' });
       await fetchCustomers();
-      showNotification('Success', 'Customer saved');
     } catch (error) {
       console.error('Error saving customer:', error);
       showNotification('Error', 'Failed to save customer', 'error');
@@ -690,7 +691,7 @@ function Dashboard() {
     doc.setTextColor(120);
     doc.setFont('helvetica', 'italic');
     doc.text(
-      'Â© Tressence by Simi | Luxury Beauty Salon',
+      '© Tressence by Simi | Luxury Beauty Salon',
       14,
       finalY + 10
     );
@@ -725,7 +726,7 @@ function Dashboard() {
   // Handle service selection
   const handleServiceSelect = (serviceId) => {
     const allServices = getAllServices();
-    const selectedService = allServices.find(s => s.id == serviceId);
+    const selectedService = allServices.find(s => s.id === Number(serviceId));
     
     if (selectedService) {
       setRecordForm({
@@ -754,7 +755,7 @@ function Dashboard() {
         phone: ''
       });
     } else {
-      const selectedCustomer = customers.find(c => c.id == customerId);
+      const selectedCustomer = customers.find(c => c.id === Number(customerId));
       if (selectedCustomer) {
         setRecordForm({
           ...recordForm,
@@ -777,7 +778,7 @@ function Dashboard() {
     return [...hairServices, ...skinServices, ...tattooServices, ...piercingServices];
   };
 
-  // âœ… FIXED: Handle record submit with proper date handling
+  // Handle record submit
   const handleRecordSubmit = async (e) => {
     e.preventDefault();
     
@@ -789,7 +790,7 @@ function Dashboard() {
       }
       
       // Get service name
-      const selectedService = getAllServices().find(s => s.id == recordForm.serviceId);
+      const selectedService = getAllServices().find(s => s.id === Number(recordForm.serviceId));
       
       // Ensure date is in YYYY-MM-DD format for backend
       const dateValue = recordForm.date || new Date().toISOString().split('T')[0];
@@ -799,16 +800,16 @@ function Dashboard() {
         customer_id: recordForm.customerId && recordForm.customerId !== 'new' ? recordForm.customerId : null,
         customer_name: recordForm.customerName || 
           (recordForm.customerId && recordForm.customerId !== 'new' ? 
-            customers.find(c => c.id == recordForm.customerId)?.name : 'Walk-in Customer'),
+            customers.find(c => c.id === Number(recordForm.customerId))?.name : 'Walk-in Customer'),
         phone: recordForm.phone || 
           (recordForm.customerId && recordForm.customerId !== 'new' ? 
-            customers.find(c => c.id == recordForm.customerId)?.phone : null),
+            customers.find(c => c.id === Number(recordForm.customerId))?.phone : null),
         service_id: recordForm.serviceId,
         service_name: selectedService?.name || '',
         category: recordForm.category,
         price: parseFloat(recordForm.price),
         payment_method: recordForm.paymentMethod,
-        date: dateValue, // Send as YYYY-MM-DD
+        date: dateValue,
         notes: recordForm.notes || ''
       };
       
@@ -913,7 +914,7 @@ function Dashboard() {
 
   // Delete all records
   const deleteAllRecords = async () => {
-    if (!window.confirm('âš ï¸ WARNING: This will permanently delete ALL records from the database. This action cannot be undone. Are you sure?')) {
+    if (!window.confirm('⚠️ WARNING: This will permanently delete ALL records from the database. This action cannot be undone. Are you sure?')) {
       return;
     }
     
@@ -931,13 +932,13 @@ function Dashboard() {
     }
   };
 
-  // âœ… Calculate total income from filtered records
+  // Calculate total income from filtered records
   const calculateIncome = () => {
     const filteredRecords = getFilteredRecords();
     return filteredRecords.reduce((total, record) => total + parseFloat(record.price || 0), 0);
   };
 
-  // âœ… Export functions for records
+  // Export functions for records
   const exportToCSV = (data, filename) => {
     const filteredRecords = getFilteredRecords();
     const totalIncome = calculateIncome();
@@ -1093,8 +1094,6 @@ function Dashboard() {
     const tableData = data.map(record => {
       let formattedDate = record.Date || '-';
       if (formattedDate !== '-') {
-        // If it's already in DD-MM-YYYY format, use it
-        // Otherwise format it properly
         if (formattedDate.includes('T') || formattedDate.length > 10) {
           const dateParts = formattedDate.split('T')[0].split('-');
           if (dateParts.length === 3) {
@@ -1327,13 +1326,14 @@ function Dashboard() {
 
   return (
     <div className={`dashboard-container ${sidebarOpen ? 'sidebar-open' : 'sidebar-closed'}`}>
+      
       {notification.show && (
         <div className={`notification ${notification.type}`}>
           <div className="notification-content">
             <div className="notification-icon">
-              {notification.type === 'success' && 'âœ“'}
-              {notification.type === 'error' && 'âœ•'}
-              {notification.type === 'info' && 'â„¹'}
+              {notification.type === 'success' && '✓'}
+              {notification.type === 'error' && '✗'}
+              {notification.type === 'info' && 'ℹ'}
             </div>
             <div className="notification-details">
               <h4>{notification.title}</h4>

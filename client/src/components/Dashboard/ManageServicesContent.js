@@ -1,10 +1,13 @@
+// client/src/components/Dashboard/ManageServicesContent.js
 import React, { useState, useEffect } from 'react';
+
 import {
   FaCut,
   FaTint,
   FaPalette,
   FaPlus,
   FaEdit,
+  FaCircle,
   FaTrash,
   FaTimes,
   FaSearch
@@ -14,13 +17,13 @@ const ManageServicesContent = ({
   hairServices = [],
   skinServices = [],
   tattooServices = [],
-  piercingServices = [], // ✅ SAFE DEFAULT
+  piercingServices = [],
   serviceForm,
   setServiceForm,
   activeServiceTab,
   setActiveServiceTab,
   handleServiceSubmit,
-  editService = () => {}, // ✅ SAFE DEFAULT
+  editService = () => {},
   deleteService,
   downloadServicesExcel,
   downloadServicesPDF,
@@ -87,11 +90,11 @@ const ManageServicesContent = ({
           className={activeServiceTab === 'piercing' ? 'active' : ''}
           onClick={() => setActiveServiceTab('piercing')}
         >
-          🪡 Piercing ({piercingServices.length})
+          <FaCircle /> Piercing ({piercingServices.length})
         </button>
       </div>
 
-      {/* ================= SEARCH ================= */}
+      {/* ================= SEARCH & EXPORT ================= */}
       <div className="filter-section">
         <div className="search-bar">
           <FaSearch />
@@ -102,32 +105,15 @@ const ManageServicesContent = ({
             onChange={(e) => setSearch(e.target.value)}
           />
         </div>
-        
 
- <div className="export-options">
-  <button onClick={() => downloadServicesExcel(activeServiceTab)}>
-    Excel
-  </button>
-
-  <button onClick={() => downloadServicesPDF(activeServiceTab)}>
-    PDF
-  </button>
-
-  <button onClick={() => downloadServicesCSV(activeServiceTab)}>
-    CSV
-  </button>
-
-  <button onClick={() => downloadServicesExcel('all')}>
-    All Services (Excel)
-  </button>
-
-  <button onClick={() => downloadServicesPDF('all')}>
-    All Services (PDF)
-  </button>
-</div>
+        <div className="export-options">
+          <button onClick={() => downloadServicesExcel(activeServiceTab)}>Excel</button>
+          <button onClick={() => downloadServicesPDF(activeServiceTab)}>PDF</button>
+          <button onClick={() => downloadServicesCSV(activeServiceTab)}>CSV</button>
+          <button onClick={() => downloadServicesExcel('all')}>All Services (Excel)</button>
+          <button onClick={() => downloadServicesPDF('all')}>All Services (PDF)</button>
+        </div>
       </div>
-
-     
 
       {/* ================= FORM ================= */}
       <div className="service-form-section">
@@ -175,7 +161,6 @@ const ManageServicesContent = ({
             </div>
           </div>
 
-          {/* OPTIONAL NOTE */}
           <div className="form-group full-width">
             <label>Extra Note (optional)</label>
             <textarea
@@ -222,7 +207,6 @@ const ManageServicesContent = ({
         <div className="services-grid">
           {filteredServices.map(service => (
             <div key={service.id} className="service-card">
-
               <div className="service-header">
                 <h3>{service.name}</h3>
                 <span className="service-price">₹{service.price}</span>
@@ -232,22 +216,16 @@ const ManageServicesContent = ({
                 {service.category}
               </span>
 
-             {service.description && (
-  <p className="form-hint">{service.description}</p>
-)}
+              {service.description && (
+                <p className="form-hint">{service.description}</p>
+              )}
 
               <div className="service-actions">
-                <button
-                  className="btn-edit"
-                  onClick={() => editService(service)}
-                >
+                <button className="btn-edit" onClick={() => editService(service)}>
                   <FaEdit /> Edit
                 </button>
 
-                <button
-                  className="btn-delete"
-                  onClick={() => deleteService(service.id)}
-                >
+                <button className="btn-delete" onClick={() => deleteService(service.id)}>
                   <FaTrash /> Delete
                 </button>
               </div>
@@ -261,6 +239,7 @@ const ManageServicesContent = ({
           )}
         </div>
       </div>
+
     </div>
   );
 };
