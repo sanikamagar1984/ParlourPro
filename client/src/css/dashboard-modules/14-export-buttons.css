@@ -1,0 +1,156 @@
+/* =========================
+   EXPORT OPTIONS & BUTTONS
+========================= */
+
+.export-options,
+.export-buttons {
+  display: flex;
+  gap: 10px;
+  margin: 14px 0 18px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.export-options button,
+.export-btn,
+.btn-export {
+  padding: 7px 14px;
+  font-size: 12.5px;
+  font-weight: 600;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  line-height: 1;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.08);
+  color: white;
+}
+
+.btn-export {
+  padding: 10px 16px;
+  border-radius: 8px;
+  font-size: 13px;
+}
+
+/* Excel - Green */
+.export-options button:nth-child(1),
+.btn-xls {
+  background: linear-gradient(135deg, #1e7e34, #28a745);
+  color: #fff;
+}
+
+.export-options button:nth-child(1):hover,
+.btn-xls:hover {
+  background: linear-gradient(135deg, #16692a, #218838);
+  transform: translateY(-1px);
+}
+
+/* PDF - Red */
+.export-options button:nth-child(2),
+.btn-pdf {
+  background: linear-gradient(135deg, #b71c1c, #e53935);
+  color: #fff;
+}
+
+.export-options button:nth-child(2):hover,
+.btn-pdf:hover {
+  background: linear-gradient(135deg, #8e1414, #c62828);
+  transform: translateY(-1px);
+}
+
+/* CSV - Gray */
+.export-options button:nth-child(3),
+.btn-csv {
+  background: linear-gradient(135deg, #455a64, #607d8b);
+  color: #fff;
+}
+
+.export-options button:nth-child(3):hover,
+.btn-csv:hover {
+  background: linear-gradient(135deg, #37474f, #546e7a);
+  transform: translateY(-1px);
+}
+
+/* All Services Excel - Brown */
+.export-options button:nth-child(4) {
+  background: linear-gradient(135deg, #8b4513, #c27c3a);
+  color: #fff;
+}
+
+.export-options button:nth-child(4):hover {
+  background: linear-gradient(135deg, #6f360f, #a8642f);
+  transform: translateY(-1px);
+}
+
+/* All Services PDF - Dark Brown */
+.export-options button:nth-child(5) {
+  background: linear-gradient(135deg, #5d4037, #8d6e63);
+  color: #fff;
+}
+
+.export-options button:nth-child(5):hover {
+  background: linear-gradient(135deg, #4e342e, #795548);
+  transform: translateY(-1px);
+}
+
+.export-options button:active,
+.btn-export:active {
+  transform: scale(0.96);
+}
+
+/* Green variants */
+.btn-csv {
+  background: linear-gradient(135deg, #10b981, #059669);
+  color: #ffffff;
+  font-weight: 700;
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+}
+
+.btn-csv:hover {
+  background: linear-gradient(135deg, #059669, #047857);
+  transform: translateY(-3px);
+  box-shadow: 0 6px 18px rgba(16, 185, 129, 0.4);
+}
+
+/* Red variants */
+.btn-xls {
+  background: linear-gradient(135deg, #ef4444, #dc2626);
+  color: #ffffff;
+  font-weight: 700;
+  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+}
+
+.btn-xls:hover {
+  background: linear-gradient(135deg, #dc2626, #b91c1c);
+  transform: translateY(-3px);
+  box-shadow: 0 6px 18px rgba(239, 68, 68, 0.4);
+}
+
+/* Blue variants */
+.btn-pdf {
+  background: linear-gradient(135deg, #6366f1, #4f46e5);
+  color: #ffffff;
+  font-weight: 700;
+  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+}
+
+.btn-pdf:hover {
+  background: linear-gradient(135deg, #4f46e5, #4338ca);
+  transform: translateY(-3px);
+  box-shadow: 0 6px 18px rgba(99, 102, 241, 0.4);
+}
+
+/* Delete All Button */
+.btn-delete-all {
+  background: linear-gradient(135deg, #dc2626, #991b1b);
+  color: white;
+}
+
+.btn-delete-all:hover {
+  background: linear-gradient(135deg, #991b1b, #7f1d1d);
+  transform: translateY(-2px);
+}

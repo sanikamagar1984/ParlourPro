@@ -1,0 +1,105 @@
+/* =========================
+   BUTTONS
+========================= */
+
+.btn-primary {
+  padding: 16px 30px;
+  background: linear-gradient(135deg, #8b4513, #d2691e);
+  color: white;
+  border: none;
+  border-radius: 12px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  transition: all 0.3s ease;
+  letter-spacing: 0.5px;
+}
+
+.btn-primary:hover {
+  background: linear-gradient(135deg, #d2691e, #8b4513);
+  transform: translateY(-3px);
+  box-shadow: 0 10px 30px rgba(139, 69, 19, 0.35);
+}
+
+.btn-secondary {
+  padding: 16px 30px;
+  background: white;
+  border: 3px solid #e1e5eb;
+  color: #666;
+  border-radius: 12px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  transition: all 0.3s ease;
+  letter-spacing: 0.5px;
+}
+
+.btn-secondary:hover {
+  border-color: #8b4513;
+  color: #8b4513;
+  background: #f8f9fa;
+  transform: translateY(-3px);
+}
+
+.btn-edit,
+.btn-delete,
+.btn-key {
+  border: none;
+  cursor: pointer;
+  padding: 10px;
+  border-radius: 10px;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.25s ease;
+}
+
+.btn-edit {
+  background: #e0f2fe;
+  color: #0369a1;
+}
+
+.btn-edit:hover {
+  background: #bae6fd;
+  transform: translateY(-2px);
+}
+
+.btn-key {
+  background: #ede9fe;
+  color: #6d28d9;
+}
+
+.btn-key:hover {
+  background: #ddd6fe;
+  transform: translateY(-2px);
+}
+
+.btn-delete {
+  background: #fee2e2;
+  color: #b91c1c;
+}
+
+.btn-delete:hover {
+  background: #fecaca;
+  transform: translateY(-2px);
+}
+
+.btn {
+  padding: 12px 24px;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.3s;
+  font-size: 14px;
+}

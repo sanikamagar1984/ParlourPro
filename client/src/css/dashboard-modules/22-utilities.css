@@ -1,0 +1,162 @@
+/* =========================
+   UTILITY & HELPER CLASSES
+========================= */
+
+/* Hide delete buttons in User Dashboard */
+.user-dashboard .btn-delete,
+.user-dashboard .btn-trash,
+.user-dashboard [class*="delete"],
+.user-dashboard [class*="Delete"],
+.user-dashboard button:has(svg[class*="trash"]),
+.user-dashboard button:contains("Delete"),
+.user-dashboard button:contains("Delete All") {
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+}
+
+/* Specifically hide Delete All button in records */
+.user-dashboard .btn-delete-all,
+.user-dashboard .delete-all-btn {
+  display: none !important;
+}
+
+/* Dashboard Content */
+.dashboard-content {
+  padding: 0;
+}
+
+/* Income Stats */
+.income-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 30px;
+  margin-bottom: 45px;
+}
+
+.income-card {
+  background: white;
+  border-radius: 18px;
+  padding: 30px;
+  display: flex;
+  align-items: center;
+  gap: 25px;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1);
+  border: 2px solid #e1e5eb;
+  transition: all 0.3s ease;
+}
+
+.income-card:hover {
+  transform: translateY(-5px);
+  border-color: #8b4513;
+  box-shadow: 0 12px 35px rgba(0, 0, 0, 0.12);
+}
+
+.income-icon {
+  width: 65px;
+  height: 65px;
+  background: linear-gradient(135deg, #8b4513, #d2691e);
+  color: white;
+  border-radius: 15px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 28px;
+  box-shadow: 0 6px 20px rgba(139, 69, 19, 0.3);
+}
+
+.income-details h3 {
+  font-size: 30px;
+  color: #2c3e50;
+  margin-bottom: 8px;
+  font-weight: 700;
+}
+
+.income-details p {
+  color: #666;
+  font-size: 15px;
+  font-weight: 600;
+}
+
+/* Recent Activity */
+.recent-activity {
+  background: white;
+  border-radius: 18px;
+  padding: 30px;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1);
+  border: 2px solid #e1e5eb;
+}
+
+.recent-activity h2 {
+  font-size: 28px;
+  color: #2c3e50;
+  margin-bottom: 25px;
+  font-weight: 700;
+  padding-bottom: 15px;
+  border-bottom: 3px solid #e1e5eb;
+}
+
+.activity-list {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.activity-item {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  padding: 20px;
+  border-radius: 12px;
+  background: #f8f9fa;
+  transition: all 0.3s ease;
+  border: 2px solid transparent;
+}
+
+.activity-item:hover {
+  background: white;
+  border-color: #8b4513;
+  transform: translateX(5px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+}
+
+.activity-icon {
+  width: 50px;
+  height: 50px;
+  background: white;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 22px;
+  color: #8b4513;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  border: 2px solid #8b4513;
+}
+
+.activity-details {
+  flex: 1;
+}
+
+.activity-details p {
+  color: #333;
+  font-size: 16px;
+  margin-bottom: 8px;
+  font-weight: 600;
+}
+
+.activity-time {
+  color: #666;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.activity-amount {
+  font-weight: 700;
+  color: #8b4513;
+  font-size: 18px;
+  background: #f8f0e3;
+  padding: 8px 16px;
+  border-radius: 8px;
+  border: 2px solid #e1d5c3;
+}

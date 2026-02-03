@@ -1,0 +1,46 @@
+/* =========================
+   WELCOME SECTION - BROWN THEME
+========================= */
+
+.welcome-section {
+  background: linear-gradient(135deg, #8b4513 0%, #a0522d 50%, #cd853f 100%);
+  color: white;
+  padding: 45px 50px;
+  border-radius: 24px;
+  margin-bottom: 45px;
+  box-shadow: 0 15px 45px rgba(139, 69, 19, 0.35);
+  position: relative;
+  overflow: hidden;
+  border: 2px solid rgba(255, 255, 255, 0.1);
+}
+
+.welcome-section::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  right: -10%;
+  width: 500px;
+  height: 500px;
+  background: radial-gradient(circle, rgba(255, 228, 181, 0.2) 0%, transparent 70%);
+  border-radius: 50%;
+}
+
+.welcome-section h1 {
+  font-size: 44px;
+  font-weight: 800;
+  margin-bottom: 16px;
+  color: #ffffff;
+  text-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  position: relative;
+  z-index: 1;
+  letter-spacing: 0.5px;
+}
+
+.welcome-section p {
+  font-size: 19px;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.95);
+  position: relative;
+  z-index: 1;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}

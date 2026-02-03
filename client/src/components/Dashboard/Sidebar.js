@@ -8,13 +8,14 @@ const Sidebar = ({
   activeTab, 
   setActiveTab, 
   setMobileSidebarOpen, 
-  handleLogout 
+  handleLogout,
+  isUserDashboard = false
 }) => (
   <aside className={`sidebar ${sidebarOpen ? 'open' : 'closed'} ${mobileSidebarOpen ? 'mobile-open' : ''}`}>
     <div className="sidebar-header">
       <div className="logo-container">
         <h2>ParlourPro</h2>
-        <p>Admin Panel</p>
+        <p>{isUserDashboard ? 'User Dashboard' : 'Admin Panel'}</p>
       </div>
       <button className="mobile-close" onClick={() => setMobileSidebarOpen(false)}>
         <FaTimes />
@@ -26,9 +27,9 @@ const Sidebar = ({
         <FaUserCircle />
       </div>
       <div className="user-details">
-        <h4>{user?.name || 'Admin User'}</h4>
-        <p>{user?.role || 'Owner'}</p>
-        <p className="user-email">{user?.email || 'admin@parlour.com'}</p>
+        <h4>{user?.name || (isUserDashboard ? 'User' : 'Admin User')}</h4>
+        <p>{user?.role === 'admin' ? 'Owner' : 'Employee'}</p>
+        <p className="user-email">{user?.email || (isUserDashboard ? 'user@parlour.com' : 'admin@parlour.com')}</p>
       </div>
     </div>
     
@@ -40,9 +41,12 @@ const Sidebar = ({
         <li className={activeTab === 'manage-services' ? 'active' : ''} onClick={() => {setActiveTab('manage-services'); setMobileSidebarOpen(false);}}>
           <FaClipboardList /> <span>Manage Services</span>
         </li>
-        <li className={activeTab === 'staff-management' ? 'active' : ''} onClick={() => {setActiveTab('staff-management'); setMobileSidebarOpen(false);}}>
-          <FaUserFriends /> <span>Staff Management</span>
-        </li>
+        {/* Only show Staff Management for admin */}
+        {!isUserDashboard && (
+          <li className={activeTab === 'staff-management' ? 'active' : ''} onClick={() => {setActiveTab('staff-management'); setMobileSidebarOpen(false);}}>
+            <FaUserFriends /> <span>Staff Management</span>
+          </li>
+        )}
         <li className={activeTab === 'customer-management' ? 'active' : ''} onClick={() => {setActiveTab('customer-management'); setMobileSidebarOpen(false);}}>
           <FaUsers /> <span>Customer Management</span>
         </li>

@@ -1,0 +1,176 @@
+/* =========================
+   SERVICE TABS
+========================= */
+
+.service-tabs {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 35px;
+  flex-wrap: wrap;
+}
+
+.service-tabs button {
+  padding: 16px 28px;
+  background: white;
+  border: 3px solid #e1e5eb;
+  border-radius: 12px;
+  color: #666;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  transition: all 0.3s ease;
+  letter-spacing: 0.5px;
+}
+
+.service-tabs button:hover {
+  border-color: #8b4513;
+  color: #8b4513;
+  transform: translateY(-3px);
+}
+
+.service-tabs button.active {
+  background: linear-gradient(135deg, #8b4513, #d2691e);
+  border-color: #8b4513;
+  color: white;
+  transform: translateY(-3px);
+  box-shadow: 0 8px 25px rgba(139, 69, 19, 0.3);
+}
+
+/* =========================
+   SERVICE CARDS
+========================= */
+
+.services-list,
+.staff-list,
+.customers-list,
+.records-list-section {
+  background: white;
+  border-radius: 18px;
+  padding: 30px;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1);
+  border: 2px solid #e1e5eb;
+  margin-bottom: 35px;
+}
+
+.records-list-section {
+  border-radius: 12px;
+  padding: 25px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.services-list h2,
+.staff-list h2,
+.customers-list h2,
+.records-list-section h2,
+.records-list-section h3 {
+  font-size: 26px;
+  color: #8b4513;
+  margin-bottom: 25px;
+  font-weight: 700;
+  padding-bottom: 15px;
+  border-bottom: 3px solid #e1e5eb;
+}
+
+.records-list-section h3 {
+  font-size: 20px;
+}
+
+.services-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 25px;
+}
+
+.service-card {
+  background: #f8f9fa;
+  border-radius: 15px;
+  padding: 25px;
+  border: 3px solid #e1e5eb;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.service-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(135deg, #8b4513, #d2691e);
+}
+
+.service-card:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.12);
+  border-color: #8b4513;
+}
+
+.service-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 20px;
+}
+
+.service-header h3 {
+  font-size: 18px;
+  color: #2c3e50;
+  font-weight: 700;
+  flex: 1;
+}
+
+.service-price {
+  background: linear-gradient(135deg, #8b4513, #d2691e);
+  color: white;
+  padding: 8px 18px;
+  border-radius: 20px;
+  font-size: 16px;
+  font-weight: 700;
+  box-shadow: 0 4px 15px rgba(139, 69, 19, 0.3);
+}
+
+.service-meta {
+  margin-bottom: 20px;
+}
+
+.service-category {
+  display: inline-block;
+  padding: 8px 18px;
+  background: #e1e5eb;
+  color: #666;
+  border-radius: 20px;
+  font-size: 14px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.service-category.hair {
+  background: linear-gradient(135deg, #e3f2fd, #bbdefb);
+  color: #1976d2;
+}
+
+.service-category.skin {
+  background: linear-gradient(135deg, #f3e5f5, #e1bee7);
+  color: #7b1fa2;
+}
+
+.service-category.tattoo {
+  background: linear-gradient(135deg, #fff3e0, #ffcc80);
+  color: #f57c00;
+}
+
+.service-category.piercing {
+  background: linear-gradient(135deg, #fce4ec, #f8bbd0);
+  color: #c2185b;
+}
+
+.service-actions {
+  display: flex;
+  gap: 12px;
+}

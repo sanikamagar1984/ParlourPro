@@ -1,0 +1,265 @@
+/* =========================
+   RESPONSIVE DESIGN
+========================= */
+
+@media (max-width: 1200px) {
+  .content-wrapper {
+    padding: 30px;
+  }
+  
+  .stats-grid,
+  .income-stats,
+  .services-grid,
+  .customers-grid {
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  }
+  
+  .records-controls {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  
+  .search-box {
+    width: 100%;
+  }
+  
+  .filter-group {
+    justify-content: space-between;
+  }
+}
+
+@media (max-width: 992px) {
+  .content-wrapper {
+    padding: 25px;
+  }
+  
+  .welcome-section h1 {
+    font-size: 34px;
+  }
+  
+  .stat-info h3 {
+    font-size: 28px;
+  }
+  
+  .section-header h1 {
+    font-size: 32px;
+  }
+}
+
+@media (max-width: 768px) {
+  .mobile-header {
+    display: flex;
+  }
+  
+  .menu-toggle-btn {
+    display: none;
+  }
+  
+  .mobile-close {
+    display: flex;
+  }
+  
+  .main-content.with-sidebar,
+  .main-content.full-width {
+    margin-left: 0;
+    width: 100%;
+    padding-top: 85px;
+    padding-left: 0;
+  }
+  
+  .content-wrapper {
+    padding: 20px;
+  }
+  
+  .sidebar {
+    left: -280px;
+  }
+  
+  .sidebar.mobile-open {
+    left: 0;
+  }
+  
+  .sidebar-overlay {
+    display: block;
+  }
+  
+  .stats-grid,
+  .income-stats,
+  .action-buttons,
+  .form-grid,
+  .form-row {
+    grid-template-columns: 1fr;
+  }
+  
+  .filter-controls {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  
+  .search-bar {
+    min-width: 100%;
+  }
+  
+  .export-options,
+  .export-buttons {
+    width: 100%;
+    justify-content: center;
+  }
+  
+  .export-btn,
+  .btn-export {
+    flex: 1;
+    justify-content: center;
+  }
+  
+  .service-tabs {
+    flex-direction: column;
+  }
+  
+  .service-tabs button {
+    width: 100%;
+    justify-content: center;
+  }
+  
+  .form-actions {
+    flex-direction: column;
+  }
+  
+  .btn-primary,
+  .btn-secondary {
+    width: 100%;
+    justify-content: center;
+  }
+  
+  .customer-actions {
+    flex-direction: column;
+  }
+  
+  .customer-actions button {
+    width: 100%;
+    justify-content: center;
+  }
+  
+  .welcome-section {
+    padding: 32px;
+  }
+  
+  .welcome-section h1 {
+    font-size: 34px;
+  }
+  
+  .welcome-section p {
+    font-size: 17px;
+  }
+  
+  .stats-grid {
+    grid-template-columns: 1fr;
+    gap: 22px;
+  }
+  
+  .action-buttons {
+    grid-template-columns: 1fr;
+    gap: 18px;
+  }
+  
+  .stat-card {
+    padding: 28px;
+  }
+  
+  .stat-value {
+    font-size: 36px !important;
+  }
+  
+  .quick-actions {
+    padding: 28px;
+  }
+  
+  .action-btn {
+    padding: 26px 32px;
+    font-size: 16px;
+  }
+  
+  .records-table {
+    font-size: 12px;
+  }
+  
+  .records-table th,
+  .records-table td {
+    padding: 8px 10px;
+  }
+}
+
+@media (max-width: 480px) {
+  .content-wrapper {
+    padding: 15px;
+  }
+  
+  .section-header h1 {
+    font-size: 28px;
+  }
+  
+  .welcome-section h1 {
+    font-size: 30px;
+  }
+  
+  .welcome-section p {
+    font-size: 17px;
+  }
+  
+  .stat-card,
+  .income-card,
+  .service-card,
+  .customer-card {
+    padding: 20px;
+  }
+  
+  .stat-info h3,
+  .income-details h3 {
+    font-size: 26px;
+  }
+  
+  .data-table {
+    display: block;
+    overflow-x: auto;
+  }
+  
+  .service-form-section h2,
+  .staff-form-section h2,
+  .customer-form-section h2,
+  .record-form-section h2 {
+    font-size: 22px;
+  }
+}
+
+/* =========================
+   PRINT STYLES
+========================= */
+@media print {
+  .mobile-header,
+  .menu-toggle-btn,
+  .sidebar,
+  .sidebar-overlay,
+  .export-btn,
+  .btn-edit,
+  .btn-delete,
+  .action-btn,
+  .form-actions,
+  .service-tabs,
+  .filter-section {
+    display: none !important;
+  }
+  
+  .main-content.with-sidebar,
+  .main-content.full-width {
+    margin-left: 0 !important;
+    width: 100% !important;
+  }
+  
+  .content-wrapper {
+    padding: 0 !important;
+  }
+  
+  body {
+    background: white !important;
+  }
+}

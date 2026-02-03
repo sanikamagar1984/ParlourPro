@@ -1,0 +1,70 @@
+/* =========================
+   PARLOURPRO DASHBOARD CSS - MODULAR
+   Main file that imports all CSS modules
+========================= */
+
+/* Base Styles & Reset */
+@import './dashboard-modules/01-base.css';
+
+/* Loading Screen */
+@import './dashboard-modules/02-loading.css';
+
+/* Dashboard Container */
+@import './dashboard-modules/03-container.css';
+
+/* Mobile Header */
+@import './dashboard-modules/04-mobile-header.css';
+
+/* Menu Toggle Button */
+@import './dashboard-modules/05-menu-toggle.css';
+
+/* Sidebar */
+@import './dashboard-modules/06-sidebar.css';
+
+/* Main Content */
+@import './dashboard-modules/07-main-content.css';
+
+/* Welcome Section - Brown Theme */
+@import './dashboard-modules/08-welcome-section.css';
+
+/* Stats Grid - Brown Theme */
+@import './dashboard-modules/09-stats-grid.css';
+
+/* Quick Actions - Brown Theme */
+@import './dashboard-modules/10-quick-actions.css';
+
+/* Buttons */
+@import './dashboard-modules/11-buttons.css';
+
+/* Forms */
+@import './dashboard-modules/12-forms.css';
+
+/* Filter & Search */
+@import './dashboard-modules/13-filter-search.css';
+
+/* Export Buttons */
+@import './dashboard-modules/14-export-buttons.css';
+
+/* Tables - Brown Theme */
+@import './dashboard-modules/15-tables.css';
+
+/* Service Tabs & Cards */
+@import './dashboard-modules/16-service-cards.css';
+
+/* Customer Cards */
+@import './dashboard-modules/17-customer-cards.css';
+
+/* Badges */
+@import './dashboard-modules/18-badges.css';
+
+/* Modals & Notifications */
+@import './dashboard-modules/19-modals-notifications.css';
+
+/* Record Management Specific */
+@import './dashboard-modules/20-record-management.css';
+
+/* Responsive Design */
+@import './dashboard-modules/21-responsive.css';
+
+/* Utilities & Helpers */
+@import './dashboard-modules/22-utilities.css';

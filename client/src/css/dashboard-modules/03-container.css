@@ -1,0 +1,10 @@
+/* =========================
+   DASHBOARD CONTAINER
+========================= */
+
+.dashboard-container {
+  display: flex;
+  min-height: 100vh;
+  position: relative;
+  background: #f5f6fa;
+}

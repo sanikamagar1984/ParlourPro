@@ -1,0 +1,62 @@
+/* =========================
+   RECORD MANAGEMENT SPECIFIC
+========================= */
+
+.record-management-content {
+  padding: 20px;
+  max-width: 1600px;
+  margin: 0 auto;
+}
+
+.content-header {
+  margin-bottom: 30px;
+}
+
+.content-header h2 {
+  color: #8B4513;
+  margin-bottom: 5px;
+  font-size: 36px;
+  font-weight: 800;
+}
+
+.content-header .subtitle {
+  color: #666;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.records-header {
+  margin-bottom: 20px;
+}
+
+.records-header h3 {
+  color: #8B4513;
+  margin-bottom: 20px;
+  font-size: 20px;
+}
+
+.records-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 15px;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+/* Staff Management Specific */
+.staff-management {
+  padding: 32px;
+  background: #f8fafc;
+}
+
+.staff-management .section-header h1 {
+  font-size: 30px;
+  font-weight: 700;
+  color: #1f2937;
+}
+
+.staff-management .section-header p {
+  font-size: 15px;
+  color: #6b7280;
+  margin-top: 6px;
+}

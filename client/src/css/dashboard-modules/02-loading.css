@@ -1,0 +1,32 @@
+/* =========================
+   LOADING SCREEN
+========================= */
+
+.loading-screen {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  background: linear-gradient(135deg, #f5f7fa, #c3cfe2);
+}
+
+.spinner {
+  width: 60px;
+  height: 60px;
+  border: 6px solid rgba(139, 69, 19, 0.2);
+  border-radius: 50%;
+  border-top-color: #8b4513;
+  animation: spin 1s linear infinite;
+  margin-bottom: 25px;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.loading-screen p {
+  color: #8b4513;
+  font-size: 20px;
+  font-weight: 500;
+}

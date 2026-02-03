@@ -1,11 +1,13 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { 
-  FaPhone, FaWhatsapp, FaInstagram, FaFacebook, 
-  FaBars, FaTimes, FaMapMarkerAlt, FaClock, 
-  FaEnvelope, FaStar
+  FaCalendarAlt, FaUsers, FaChartLine, FaClipboardList,
+  FaUserTie, FaHistory, FaUserShield, FaWhatsapp,
+  FaStar, FaPhone, FaInstagram, FaFacebook, FaMapMarkerAlt,
+  FaClock, FaEnvelope, FaBars, FaTimes
 } from 'react-icons/fa';
-import './../css/Homepage.css';  // Import the CSS
+import './../css/Homepage.css';
+
 function HomePage() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
@@ -13,13 +15,37 @@ function HomePage() {
   const whatsappNumber = '919833072760';
   const emailAddress = 'tressencebysimi@gmail.com';
 
-  const services = [
-    { title: "Bridal Makeup", price: "₹15,000+", desc: "Complete bridal package with trials" },
-    { title: "Hair Styling", price: "₹2,500+", desc: "Professional hair styling for all occasions" },
-    { title: "Spa Treatments", price: "₹3,000+", desc: "Relaxing facial and body treatments" },
-    { title: "Nail Art", price: "₹1,500+", desc: "Creative nail designs and manicures" },
-    { title: "Skin Care", price: "₹4,000+", desc: "Customized facial treatments" },
-    { title: "Mehendi Art", price: "₹5,000+", desc: "Traditional and contemporary designs" },
+  const features = [
+    { 
+      title: "Appointment Management", 
+      icon: <FaCalendarAlt />,
+      desc: "Schedule and manage customer appointments efficiently"
+    },
+    { 
+      title: "Customer Database", 
+      icon: <FaUsers />,
+      desc: "Access complete customer records and history"
+    },
+    { 
+      title: "Service Management", 
+      icon: <FaClipboardList />,
+      desc: "Manage beauty services, pricing, and categories"
+    },
+    { 
+      title: "Business Analytics", 
+      icon: <FaChartLine />,
+      desc: "View daily/monthly income and performance reports"
+    },
+    { 
+      title: "Staff Management", 
+      icon: <FaUserTie />,
+      desc: "Manage employee profiles and permissions"
+    },
+    { 
+      title: "Transaction History", 
+      icon: <FaHistory />,
+      desc: "Complete record of all business transactions"
+    },
   ];
 
   const testimonials = [
@@ -48,13 +74,13 @@ function HomePage() {
 
           <nav className={`nav-menu ${mobileMenuOpen ? 'open' : ''}`}>
             <button onClick={() => scrollToSection('home')}>Home</button>
-            <button onClick={() => scrollToSection('services')}>Services</button>
+            <button onClick={() => scrollToSection('features')}>Features</button>
             <button onClick={() => scrollToSection('testimonials')}>Reviews</button>
             <button onClick={() => scrollToSection('contact')}>Contact</button>
-                <div className="auth-buttons">
-                <Link to="/login" className="login-btn">Login</Link>
-                <Link to="/sign" className="signup-btn">Sign Up</Link> {/* Change from /signup to /sign */}
-                </div>
+            <div className="auth-buttons">
+              <Link to="/login" className="login-btn">Login</Link>
+              <Link to="/sign" className="signup-btn">Sign Up</Link>
+            </div>
           </nav>
 
           <button className="mobile-menu-btn" onClick={() => setMobileMenuOpen(!mobileMenuOpen)}>
@@ -69,32 +95,33 @@ function HomePage() {
           <h2>Experience Luxury Beauty Services</h2>
           <p>Professional makeup, hair styling, and spa treatments for your special moments</p>
           <div className="hero-buttons">
-            <button className="btn-primary" onClick={() => scrollToSection('services')}>
-              View Services
+            <button className="btn-primary" onClick={() => scrollToSection('features')}>
+              View Features
             </button>
-            <a href={`https://wa.me/${whatsappNumber}`} className="btn-whatsapp">
+            <a href={`https://wa.me/${whatsappNumber}`} className="btn-whatsapp" target="_blank" rel="noopener noreferrer">
               <FaWhatsapp /> Book via WhatsApp
             </a>
           </div>
         </div>
       </section>
 
-      {/* Services Section */}
-      <section id="services" className="services">
+      {/* Features Section */}
+      <section id="features" className="services">
         <div className="container">
-          <h2 className="section-title">Our Premium Services</h2>
-          <p className="section-subtitle">Professional beauty services for all occasions</p>
+          <h2 className="section-title">Portal Features</h2>
+          <p className="section-subtitle">Comprehensive business management tools</p>
           
           <div className="services-grid">
-            {services.map((service, index) => (
+            {features.map((feature, index) => (
               <div key={index} className="service-card">
-                <div className="service-icon">{service.title.charAt(0)}</div>
-                <h3>{service.title}</h3>
-                <p className="service-price">{service.price}</p>
-                <p className="service-desc">{service.desc}</p>
-                <a href={`https://wa.me/${whatsappNumber}`} className="book-btn">
-                  Book Now
-                </a>
+                <div className="service-icon" style={{ fontSize: '40px', background: 'linear-gradient(135deg, #8b4513, #d2691e)' }}>
+                  {feature.icon}
+                </div>
+                <h3>{feature.title}</h3>
+                <p className="service-desc">{feature.desc}</p>
+                <Link to="/login" className="book-btn">
+                  Access Feature
+                </Link>
               </div>
             ))}
           </div>
@@ -169,27 +196,27 @@ function HomePage() {
               <h3>Tressence by Simi</h3>
               <p>Professional beauty services since 2018</p>
             </div>
-                <div className="footer-links">
-                <button onClick={() => scrollToSection('home')}>Home</button>
-                <button onClick={() => scrollToSection('services')}>Services</button>
-                <button onClick={() => scrollToSection('contact')}>Contact</button>
-                <Link to="/login">Login</Link>
-                <Link to="/sign">Sign Up</Link> {/* Change from /signup to /sign */}
-                </div>
+            <div className="footer-links">
+              <button onClick={() => scrollToSection('home')}>Home</button>
+              <button onClick={() => scrollToSection('features')}>Features</button>
+              <button onClick={() => scrollToSection('contact')}>Contact</button>
+              <Link to="/login">Login</Link>
+              <Link to="/sign">Sign Up</Link>
+            </div>
             <div className="footer-social">
               <h4>Follow Us</h4>
               <div className="social-icons">
                 <a href="https://www.instagram.com/tressencebysimi" target="_blank" rel="noopener noreferrer">
                   <FaInstagram />
                 </a>
-                <a href="#" target="_blank" rel="noopener noreferrer">
+                <a href="https://www.facebook.com" target="_blank" rel="noopener noreferrer">
                   <FaFacebook />
                 </a>
                 <a href={`https://wa.me/${whatsappNumber}`} target="_blank" rel="noopener noreferrer">
                   <FaWhatsapp />
                 </a>
               </div>
-              <p className="copyright">© 2024 Tressence by Simi. All rights reserved.</p>
+              <p className="copyright">© 2026 Tressence by Simi. All rights reserved.</p>
             </div>
           </div>
         </div>

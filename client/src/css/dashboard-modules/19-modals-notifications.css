@@ -1,0 +1,179 @@
+/* =========================
+   MODAL STYLES
+========================= */
+
+.modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.modal-box {
+  background: #ffffff;
+  padding: 32px;
+  border-radius: 16px;
+  width: 760px;
+  max-width: 95%;
+  box-shadow: 0 24px 50px rgba(0,0,0,0.3);
+}
+
+.modal-box h2,
+.modal-box h3 {
+  font-size: 22px;
+  font-weight: 600;
+  margin-bottom: 22px;
+  color: #2c2c2c;
+}
+
+.modal-box input,
+.modal-box select {
+  width: 100%;
+  padding: 16px 18px;
+  font-size: 16px;
+  border-radius: 12px;
+  border: 1.5px solid #dcdcdc;
+  outline: none;
+  transition: all 0.25s ease;
+}
+
+.modal-box input:focus,
+.modal-box select:focus {
+  border-color: #c27c3a;
+  box-shadow: 0 0 0 4px rgba(194, 124, 58, 0.25);
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 14px;
+  margin-top: 24px;
+}
+
+/* =========================
+   NOTIFICATION STYLES
+========================= */
+
+.notification {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 9999;
+  min-width: 350px;
+  max-width: 400px;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+  overflow: hidden;
+  animation: slideInRight 0.3s ease-out;
+  border-left: 5px solid;
+}
+
+@keyframes slideInRight {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+.notification.success {
+  border-left-color: #27ae60;
+}
+
+.notification.error {
+  border-left-color: #e74c3c;
+}
+
+.notification.info {
+  border-left-color: #3498db;
+}
+
+.notification-content {
+  display: flex;
+  align-items: flex-start;
+  padding: 20px;
+  gap: 15px;
+}
+
+.notification-icon {
+  font-size: 24px;
+  flex-shrink: 0;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.notification.success .notification-icon {
+  background: rgba(39, 174, 96, 0.1);
+  color: #27ae60;
+}
+
+.notification.error .notification-icon {
+  background: rgba(231, 76, 60, 0.1);
+  color: #e74c3c;
+}
+
+.notification.info .notification-icon {
+  background: rgba(52, 152, 219, 0.1);
+  color: #3498db;
+}
+
+.notification-details {
+  flex: 1;
+}
+
+.notification-details h4 {
+  margin: 0 0 5px 0;
+  font-size: 16px;
+  font-weight: 600;
+  color: #2c3e50;
+}
+
+.notification-details p {
+  margin: 0;
+  font-size: 14px;
+  color: #666;
+  line-height: 1.4;
+}
+
+.notification-close {
+  background: none;
+  border: none;
+  color: #999;
+  cursor: pointer;
+  font-size: 16px;
+  padding: 5px;
+  transition: color 0.2s ease;
+  flex-shrink: 0;
+}
+
+.notification-close:hover {
+  color: #333;
+}
+
+/* =========================
+   NO DATA STATE
+========================= */
+
+.no-data,
+.no-records {
+  text-align: center;
+  padding: 40px 20px;
+  color: #6b7280;
+  font-style: italic;
+  font-size: 15px;
+}
+
+.no-records {
+  color: #999;
+}

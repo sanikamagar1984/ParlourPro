@@ -1,0 +1,118 @@
+/* =========================
+   BADGES
+========================= */
+
+.category-badge,
+.payment-badge,
+.role-badge {
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 700;
+  display: inline-block;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.category-badge {
+  padding: 4px 12px;
+  border-radius: 12px;
+  font-size: 11px;
+}
+
+/* Category Badges */
+.category-badge.hair {
+  background: linear-gradient(135deg, #e3f2fd, #bbdefb);
+  color: #1976d2;
+  border: 2px solid #bbdefb;
+}
+
+.category-badge.HAIR {
+  background: #E3F2FD;
+  color: #1976D2;
+}
+
+.category-badge.skin {
+  background: linear-gradient(135deg, #f3e5f5, #e1bee7);
+  color: #7b1fa2;
+  border: 2px solid #e1bee7;
+}
+
+.category-badge.SKIN {
+  background: #F3E5F5;
+  color: #7B1FA2;
+}
+
+.category-badge.tattoo {
+  background: linear-gradient(135deg, #fff3e0, #ffcc80);
+  color: #f57c00;
+  border: 2px solid #ffcc80;
+}
+
+.category-badge.TATTOO {
+  background: #FFF3E0;
+  color: #F57C00;
+}
+
+.category-badge.piercing {
+  background: linear-gradient(135deg, #fce4ec, #f8bbd0);
+  color: #c2185b;
+  border: 2px solid #f8bbd0;
+}
+
+.category-badge.PIERCING {
+  background: #FCE4EC;
+  color: #C2185B;
+}
+
+/* Payment Badges */
+.payment-badge.cash {
+  background: linear-gradient(135deg, #e8f5e9, #c8e6c9);
+  color: #388e3c;
+  border: 2px solid #c8e6c9;
+}
+
+.payment-badge.CASH {
+  background: #E8F5E9;
+  color: #2E7D32;
+}
+
+.payment-badge.card {
+  background: linear-gradient(135deg, #fff3e0, #ffcc80);
+  color: #f57c00;
+  border: 2px solid #ffcc80;
+}
+
+.payment-badge.CARD {
+  background: #FFF3E0;
+  color: #F57C00;
+}
+
+.payment-badge.upi {
+  background: linear-gradient(135deg, #e3f2fd, #bbdefb);
+  color: #1976d2;
+  border: 2px solid #bbdefb;
+}
+
+.payment-badge.UPI {
+  background: #E3F2FD;
+  color: #1976D2;
+}
+
+.payment-badge.online {
+  background: linear-gradient(135deg, #fce4ec, #f8bbd0);
+  color: #c2185b;
+  border: 2px solid #f8bbd0;
+}
+
+/* Role Badge */
+.role-badge {
+  display: inline-block;
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 600;
+  text-transform: uppercase;
+  background: #ecfeff;
+  color: #0f766e;
+}

@@ -1,0 +1,58 @@
+/* =========================
+   MOBILE HEADER
+========================= */
+
+.mobile-header {
+  display: none;
+  background: linear-gradient(135deg, #8b4513, #d2691e);
+  color: white;
+  padding: 18px 25px;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+  box-shadow: 0 4px 20px rgba(139, 69, 19, 0.2);
+  align-items: center;
+  justify-content: space-between;
+  height: 70px;
+}
+
+.mobile-menu-btn {
+  background: rgba(255, 255, 255, 0.1);
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  color: white;
+  font-size: 22px;
+  cursor: pointer;
+  padding: 10px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+}
+
+.mobile-menu-btn:hover {
+  background: rgba(255, 255, 255, 0.2);
+  transform: scale(1.05);
+}
+
+.logo-mobile h2 {
+  font-size: 24px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  color: white;
+  margin: 0;
+}
+
+.user-mobile {
+  font-size: 26px;
+  color: white;
+  background: rgba(255, 255, 255, 0.1);
+  width: 45px;
+  height: 45px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
