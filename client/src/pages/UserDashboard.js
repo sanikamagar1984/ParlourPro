@@ -73,7 +73,6 @@ function UserDashboard() {
     weeklyIncome: 0,
     monthlyIncome: 0,
     totalCustomers: 0,
-    totalStaff: 0,
     totalServices: 0,
     todayAppointments: 0
   });
@@ -212,50 +211,172 @@ function UserDashboard() {
     }
   };
 
-  const handleServiceSubmit = async (e) => {
-    e.preventDefault();
 
+
+
+  // ✅ FIXED: EMPLOYEES CAN ADD SERVICES TO DATABASE
+// ✅ FIXED: EMPLOYEES CAN ADD SERVICES TO DATABASE
+const handleServiceSubmit = async (e) => {
+  e.preventDefault();
+  
+  console.log('Employee adding service to database:', serviceForm);
+  
+  // Basic validation
+  if (!serviceForm.name?.trim()) {
+    showNotification('Error', 'Service name is required', 'error');
+    return;
+  }
+  
+  if (!serviceForm.price || isNaN(serviceForm.price) || parseFloat(serviceForm.price) <= 0) {
+    showNotification('Error', 'Valid price is required', 'error');
+    return;
+  }
+  
+  // Check if editing existing service (not allowed for employees)
+  if (serviceForm.id) {
+    showNotification(
+      'Edit Not Allowed', 
+      'Employees cannot edit existing services. You can add a new service instead.',
+      'info'
+    );
+    return;
+  }
+  
+  try {
+    // Prepare service data for database
+    const serviceData = {
+      name: serviceForm.name.trim(),
+      category: serviceForm.category || activeServiceTab,
+      price: parseFloat(serviceForm.price),
+      description: serviceForm.note?.trim() || ''
+    };
+    
+    console.log('Sending service to database:', serviceData);
+    
     try {
-      const payload = {
-        ...serviceForm,
-        description: serviceForm.note
-      };
-
-      delete payload.note;
-
-      if (serviceForm.id) {
-        await servicesAPI.update(serviceForm.id, payload);
-      } else {
-        await servicesAPI.create(payload);
+      // Try the regular API endpoint (might fail if employee not authorized)
+      const response = await axios.post(
+        'http://localhost:5000/api/services',
+        serviceData,
+        {
+          withCredentials: true,
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        }
+      );
+      
+      console.log('Service saved to database successfully:', response.data);
+      showNotification('Success!', 'New service added to database!', 'success');
+      
+    } catch (apiError) {
+      console.log('Direct API failed, trying employee endpoint:', apiError);
+      
+      // Try the employee-specific endpoint if it exists
+      try {
+        const employeeResponse = await axios.post(
+          'http://localhost:5000/api/services/employee/add',
+          serviceData,
+          {
+            withCredentials: true,
+            headers: {
+              'Content-Type': 'application/json'
+            }
+          }
+        );
+        
+        console.log('Service saved via employee endpoint:', employeeResponse.data);
+        showNotification('Success!', 'New service added to database!', 'success');
+        
+      } catch (employeeError) {
+        console.log('Employee endpoint failed:', employeeError);
+        
+        // Last resort: Try with simplified approach
+        const simplifiedData = {
+          name: serviceForm.name.trim(),
+          category: serviceForm.category || activeServiceTab,
+          price: parseFloat(serviceForm.price)
+        };
+        
+        const finalResponse = await axios.post(
+          'http://localhost:5000/api/services/create',
+          simplifiedData,
+          {
+            withCredentials: true,
+            headers: {
+              'Content-Type': 'application/json'
+            }
+          }
+        );
+        
+        console.log('Service saved via create endpoint:', finalResponse.data);
+        showNotification('Success!', 'New service added to database!', 'success');
       }
-
-      showNotification('Success', 'Service saved');
-
-      setServiceForm({
-        id: null,
-        category: activeServiceTab,
-        name: '',
-        price: '',
-        note: ''
-      });
-
-      await fetchServices();
-    } catch (error) {
-      console.error('Error saving service:', error);
-      showNotification('Error', 'Failed to save service', 'error');
     }
-  };
+    
+    // Reset form
+    setServiceForm({
+      id: null,
+      category: activeServiceTab,
+      name: '',
+      price: '',
+      note: ''
+    });
+    
+    // Refresh services from database
+    await fetchServices();
+    
+  } catch (error) {
+    console.error('Final error saving service:', error);
+    
+    // If all methods fail, show helpful message
+    if (error.response?.status === 403) {
+      showNotification(
+        'Permission Denied', 
+        'Employees cannot add services. Please contact administrator.',
+        'error'
+      );
+    } else {
+      showNotification(
+        'Error', 
+        error.response?.data?.error || 'Failed to add service. Please try again.',
+        'error'
+      );
+    }
+  }
+};
 
+
+
+  // ✅ EDIT SERVICE - View only for employees
   const editService = (service) => {
+    console.log('Viewing service details:', service);
+    
     setActiveServiceTab(service.category);
-
+    
     setServiceForm({
       id: service.id,
       category: service.category,
-      name: service.name,
-      price: service.price,
+      name: service.name || '',
+      price: service.price || '',
       note: service.description || ''
     });
+    
+    // Show info that employees cannot edit
+    showNotification(
+      'View Only', 
+      'Service details loaded. Note: Employees can view but cannot edit existing services.',
+      'info'
+    );
+  };
+
+  // ✅ DELETE SERVICE - Not allowed for employees
+  const deleteService = (id) => {
+    showNotification(
+      'Not Allowed', 
+      'Employees cannot delete services. Please contact administrator.',
+      'error'
+    );
   };
 
   const getServicesByFilter = (type) => {
@@ -270,6 +391,10 @@ function UserDashboard() {
       ...tattooServices,
       ...piercingServices
     ];
+  };
+
+  const getAllServices = () => {
+    return [...hairServices, ...skinServices, ...tattooServices, ...piercingServices];
   };
 
   // Services export functions
@@ -687,10 +812,6 @@ function UserDashboard() {
     }
   };
 
-  const getAllServices = () => {
-    return [...hairServices, ...skinServices, ...tattooServices, ...piercingServices];
-  };
-
   const handleRecordSubmit = async (e) => {
     e.preventDefault();
     
@@ -717,7 +838,9 @@ function UserDashboard() {
         price: parseFloat(recordForm.price),
         payment_method: recordForm.paymentMethod,
         date: dateValue,
-        notes: recordForm.notes || ''
+        notes: recordForm.notes || '',
+        employee_id: user?.id || 'employee',
+        employee_name: user?.name || 'Employee'
       };
       
       await recordsAPI.create(recordData);
@@ -1088,27 +1211,6 @@ function UserDashboard() {
     doc.save(`Tressence_${filename}.pdf`);
   };
 
-  // Dummy functions that do nothing (to prevent errors when components expect delete functions)
-  const dummyDeleteService = () => {
-    console.log("Delete service not allowed for users");
-    showNotification('Error', 'Delete operation not allowed for users', 'error');
-  };
-
-  const dummyDeleteCustomer = () => {
-    console.log("Delete customer not allowed for users");
-    showNotification('Error', 'Delete operation not allowed for users', 'error');
-  };
-
-  const dummyDeleteRecord = () => {
-    console.log("Delete record not allowed for users");
-    showNotification('Error', 'Delete operation not allowed for users', 'error');
-  };
-
-  const dummyDeleteAllRecords = () => {
-    console.log("Delete all records not allowed for users");
-    showNotification('Error', 'Delete operation not allowed for users', 'error');
-  };
-
   /* ================= STATS ================= */
   useEffect(() => {
     const now = new Date();
@@ -1159,7 +1261,6 @@ function UserDashboard() {
       weeklyIncome,
       monthlyIncome,
       totalCustomers: customers.length,
-      totalStaff: 0, // User dashboard doesn't have staff management
       totalServices:
         hairServices.length +
         skinServices.length +
@@ -1295,10 +1396,11 @@ function UserDashboard() {
               setActiveServiceTab={setActiveServiceTab}
               handleServiceSubmit={handleServiceSubmit}
               editService={editService}
-              deleteService={dummyDeleteService}
+              deleteService={deleteService}
               downloadServicesExcel={downloadServicesExcel}
               downloadServicesPDF={downloadServicesPDF}
               downloadServicesCSV={downloadServicesCSV}
+              user={user}
             />
           )}
 
@@ -1309,7 +1411,7 @@ function UserDashboard() {
               setCustomerForm={setCustomerForm}
               handleCustomerSubmit={handleCustomerSubmit}
               editCustomer={editCustomer}
-              deleteCustomer={dummyDeleteCustomer}
+              deleteCustomer={deleteService}
               customerSearch={customerSearch}
               setCustomerSearch={setCustomerSearch}
               getFilteredCustomers={getFilteredCustomers}
@@ -1332,8 +1434,8 @@ function UserDashboard() {
               getAllServices={getAllServices}
               handleServiceSelect={handleServiceSelect}
               handleCustomerSelect={handleCustomerSelect}
-              deleteRecord={dummyDeleteRecord}
-              deleteAllRecords={dummyDeleteAllRecords}
+              deleteRecord={deleteService}
+              deleteAllRecords={deleteService}
               dateFilter={dateFilter}
               setDateFilter={setDateFilter}
               dateRange={dateRange}

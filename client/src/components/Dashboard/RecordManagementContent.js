@@ -40,7 +40,7 @@ function RecordManagementContent({
     return `${year}-${month}-${day}`;
   };
 
-  // ✅ Initialize date range on component mount
+  // ✅ Initialize date range on component mount AND set form date to today
   useEffect(() => {
     const today = getTodayDate();
     setDateRange({
@@ -48,6 +48,12 @@ function RecordManagementContent({
       end: today
     });
     setDateFilter('all');
+    
+    // ✅ IMPORTANT: Always set the form date to today when component mounts
+    setRecordForm(prev => ({
+      ...prev,
+      date: today
+    }));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -113,7 +119,7 @@ function RecordManagementContent({
     handleCustomerSelect(customerId);
   };
 
-  // ✅ Clear form function
+  // ✅ Clear form function - UPDATED to reset date to today
   const clearForm = () => {
     setRecordForm({
       customerId: '',
@@ -123,7 +129,7 @@ function RecordManagementContent({
       category: '',
       price: '',
       paymentMethod: 'cash',
-      date: getTodayDate(),
+      date: getTodayDate(), // ✅ Always reset to today's date
       notes: ''
     });
   };
@@ -357,7 +363,7 @@ function RecordManagementContent({
               </select>
             </div>
 
-            {/* Date */}
+            {/* Date - FIXED to always show today by default */}
             <div className="form-group">
               <label>Date</label>
               <input
