@@ -211,3 +211,47 @@
   display: none;
   backdrop-filter: blur(5px);
 }
+
+
+/* =========================
+   MOBILE RESPONSIVE
+========================= */
+@media (max-width: 767px) {
+  .sidebar {
+    width: 85%;
+    max-width: 280px;
+    left: -100%;
+    position: fixed;
+    z-index: 1001;
+  }
+  
+  .sidebar.mobile-open {
+    left: 0;
+  }
+  
+  .menu-toggle-btn {
+    display: none !important;
+  }
+  
+  .mobile-close {
+    display: flex !important;
+  }
+  
+  .sidebar-overlay {
+    display: none;
+  }
+  
+  .sidebar-overlay.active {
+    display: block;
+  }
+}
+
+@media (min-width: 768px) {
+  .mobile-close {
+    display: none !important;
+  }
+  
+  .sidebar-overlay {
+    display: none !important;
+  }
+}

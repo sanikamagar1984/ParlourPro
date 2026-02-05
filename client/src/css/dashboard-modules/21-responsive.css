@@ -263,3 +263,59 @@
     background: white !important;
   }
 }
+
+
+
+/* =========================
+   RESPONSIVE DESIGN - MOBILE FIRST
+========================= */
+
+/* MOBILE (Default - below 768px) */
+.mobile-header {
+  display: flex;
+}
+
+.sidebar {
+  left: -100%;
+}
+
+.menu-toggle-btn {
+  display: none;
+}
+
+.mobile-close {
+  display: flex;
+}
+
+.main-content.with-sidebar {
+  margin-left: 0;
+  width: 100%;
+  padding-top: 70px;
+}
+
+/* TABLET (768px and up) */
+@media (min-width: 768px) {
+  .mobile-header {
+    display: none;
+  }
+  
+  .sidebar {
+    left: 0;
+  }
+  
+  .menu-toggle-btn {
+    display: flex;
+  }
+  
+  .mobile-close {
+    display: none;
+  }
+  
+  .main-content.with-sidebar {
+    margin-left: 280px;
+    width: calc(100% - 280px);
+    padding-top: 0;
+  }
+}
+
+/* Additional responsive styles... */

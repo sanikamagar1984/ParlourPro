@@ -1,10 +1,15 @@
 import React from 'react';
-import { FaMoneyBillWave, FaUsers, FaUserTie, FaCut, FaClipboardList, FaHistory } from 'react-icons/fa';
+import {
+  FaMoneyBillWave,
+  FaUsers,
+  FaUserTie,
+  FaCut
+} from 'react-icons/fa';
 
-function DashboardContent({ user, stats, setActiveTab }) {
-  
+function DashboardContent({ user, stats = {}, setActiveTab }) {
   return (
     <div className="dashboard-content">
+      {/* Welcome */}
       <div className="welcome-section">
         <h1>Welcome back, {user?.name || 'Admin'}!</h1>
         <p>Here's what's happening with your business today.</p>
@@ -18,8 +23,12 @@ function DashboardContent({ user, stats, setActiveTab }) {
           </div>
           <div className="stat-details">
             <h3>Today's Income</h3>
-            <p className="stat-value">₹{stats.dailyIncome.toLocaleString('en-IN')}</p>
-            <span className="stat-label">{stats.todayAppointments} services completed</span>
+            <p className="stat-value">
+              ₹{(stats.dailyIncome || 0).toLocaleString('en-IN')}
+            </p>
+            <span className="stat-label">
+              {stats.todayAppointments || 0} services completed
+            </span>
           </div>
         </div>
 
@@ -29,7 +38,9 @@ function DashboardContent({ user, stats, setActiveTab }) {
           </div>
           <div className="stat-details">
             <h3>Monthly Income</h3>
-            <p className="stat-value">₹{stats.monthlyIncome.toLocaleString('en-IN')}</p>
+            <p className="stat-value">
+              ₹{(stats.monthlyIncome || 0).toLocaleString('en-IN')}
+            </p>
             <span className="stat-label">This month's total</span>
           </div>
         </div>
@@ -40,7 +51,7 @@ function DashboardContent({ user, stats, setActiveTab }) {
           </div>
           <div className="stat-details">
             <h3>Total Customers</h3>
-            <p className="stat-value">{stats.totalCustomers}</p>
+            <p className="stat-value">{stats.totalCustomers || 0}</p>
             <span className="stat-label">Registered customers</span>
           </div>
         </div>
@@ -51,7 +62,7 @@ function DashboardContent({ user, stats, setActiveTab }) {
           </div>
           <div className="stat-details">
             <h3>Staff Members</h3>
-            <p className="stat-value">{stats.totalStaff}</p>
+            <p className="stat-value">{stats.totalStaff || 0}</p>
             <span className="stat-label">Active employees</span>
           </div>
         </div>
@@ -62,14 +73,19 @@ function DashboardContent({ user, stats, setActiveTab }) {
           </div>
           <div className="stat-details">
             <h3>Total Services</h3>
-            <p className="stat-value">{stats.totalServices}</p>
+            <p className="stat-value">{stats.totalServices || 0}</p>
             <span className="stat-label">Available services</span>
           </div>
         </div>
       </div>
 
-      {/* Quick Actions */}
-     
+      {/* Developer Credit (Common Line) */}
+      <div className="dashboard-footer-credit">
+        <p>
+          © 2026 Tressence by Simi. Created & Maintained by{' '}
+          <strong>Shravani Mandve</strong>
+        </p>
+      </div>
     </div>
   );
 }

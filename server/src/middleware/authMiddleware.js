@@ -1,10 +1,7 @@
 const jwt = require('jsonwebtoken');
 
-/* ======================================================
-   AUTH MIDDLEWARE
-   - Checks JWT token from cookie
-   - Allows access only if logged in
-====================================================== */
+
+
 const authMiddleware = (req, res, next) => {
   try {
     // Get token from cookie or Authorization header
@@ -25,7 +22,7 @@ const authMiddleware = (req, res, next) => {
       process.env.JWT_SECRET || 'parlour_secret'
     );
 
-    // ✅ Attach decoded payload consistently
+    //  Attach decoded payload consistently
     req.user = {
       userId: decoded.userId || decoded.id,
       email: decoded.email,

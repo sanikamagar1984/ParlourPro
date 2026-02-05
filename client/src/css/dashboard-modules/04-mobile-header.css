@@ -56,3 +56,17 @@
   align-items: center;
   justify-content: center;
 }
+/* =========================
+   MOBILE RESPONSIVE
+========================= */
+@media (max-width: 767px) {
+  .mobile-header {
+    display: flex !important;
+  }
+}
+
+@media (min-width: 768px) {
+  .mobile-header {
+    display: none !important;
+  }
+}

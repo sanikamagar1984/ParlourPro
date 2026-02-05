@@ -847,3 +847,17 @@ input[name="password"]:not(:placeholder-shown) ~ .password-hint small {
     font-size: 50px !important;
   }
 }
+
+/* ===== FOOTER DEVELOPER CREDIT FIX ===== */
+.footer-social .developer-credit {
+  font-size: 13px;
+  color: #aaa;
+  margin-top: 6px;
+  text-align: center;
+  letter-spacing: 0.4px;
+}
+
+.footer-social .developer-credit span {
+  color: #d2691e;
+  font-weight: 600;
+}

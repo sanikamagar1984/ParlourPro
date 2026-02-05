@@ -5,7 +5,7 @@ import axios from 'axios';
 import * as XLSX from 'xlsx';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
-import { FaTimes } from 'react-icons/fa';
+import { FaTimes, FaBars, FaUserCircle } from 'react-icons/fa';
 
 import {
   servicesAPI,
@@ -23,6 +23,7 @@ import CustomerManagementContent from '../components/Dashboard/CustomerManagemen
 import RecordManagementContent from '../components/Dashboard/RecordManagementContent';
 
 import './../css/Dashboard.css';
+// Add this after imports, before Dashboard function
 
 function Dashboard() {
   const navigate = useNavigate();
@@ -505,18 +506,142 @@ function Dashboard() {
     }
   };
 
-  const deleteCustomer = async (id) => {
-    if (!window.confirm('Delete customer?')) return;
+// In Dashboard.js, replace the deleteCustomer function with this:
+// In Dashboard.js, update the deleteCustomer function
+const deleteCustomer = async (id, force = false) => {
+  // Skip confirmation if force deleting (coming from modal)
+  if (!force && !window.confirm('Are you sure you want to delete this customer? This action cannot be undone.')) {
+    return;
+  }
 
-    try {
-      await customersAPI.delete(id);
-      await fetchCustomers();
-      showNotification('Success', 'Customer deleted');
-    } catch (error) {
-      console.error('Error deleting customer:', error);
-      showNotification('Error', 'Failed to delete customer', 'error');
+  try {
+    console.group('🗑️ Deleting Customer');
+    console.log('Customer ID:', id, 'Force:', force);
+    
+    // Get customer details for better feedback
+    const customer = customers.find(c => c.id === id);
+    if (customer) {
+      console.log('Customer details:', customer);
     }
-  };
+
+    // Only check records if NOT force deleting (modal already showed warning)
+    if (!force) {
+      try {
+        const allRecords = await recordsAPI.getAll();
+        const customerRecords = allRecords.data.records?.filter(r => 
+          r.customer_id === id || 
+          r.customer_name?.includes(customer?.name)
+        ) || [];
+        
+        if (customerRecords.length > 0) {
+          const confirmDeleteWithRecords = window.confirm(
+            `⚠️ WARNING!\n\nCustomer "${customer?.name}" has ${customerRecords.length} service record(s).\n\n` +
+            `If you delete this customer, these records will show as "Unknown Customer".\n\n` +
+            `Do you want to delete the customer anyway?`
+          );
+          
+          if (!confirmDeleteWithRecords) {
+            console.log('Deletion cancelled due to existing records');
+            return;
+          }
+        }
+      } catch (recordError) {
+        console.log('Could not check records:', recordError.message);
+      }
+    }
+
+    // Make the API call
+    console.log('Calling customersAPI.delete()...');
+    const response = await customersAPI.delete(id);
+    
+    console.log('API Response:', response.data);
+    
+    if (response.data.success) {
+      // Remove from state
+      setCustomers(prev => prev.filter(c => c.id !== id));
+      
+      // Clear form if this customer was being edited
+      if (customerForm.id === id) {
+        setCustomerForm({ id: null, name: '', phone: '', email: '', address: '' });
+      }
+      
+      showNotification(
+        'Success', 
+        `Customer "${customer?.name || 'Deleted'}" has been removed successfully.`,
+        'success'
+      );
+      
+      console.log('✅ Customer deleted successfully');
+      
+    } else {
+      // API returned success: false
+      console.error('API returned failure:', response.data);
+      
+      const errorMessage = response.data.error || 
+                          response.data.message || 
+                          'Failed to delete customer.';
+      
+      // Check for specific error messages
+      if (response.data.error?.includes('records')) {
+        showNotification(
+          'Cannot Delete Customer',
+          `${errorMessage}\n\nPlease delete the customer's service records first.`,
+          'error'
+        );
+      } else {
+        showNotification('Error', errorMessage, 'error');
+      }
+    }
+    
+  } catch (error) {
+    console.error('❌ Error deleting customer:', error);
+    
+    // Show appropriate error message based on error type
+    let userMessage = 'An error occurred while deleting the customer.';
+    let notificationType = 'error';
+    
+    if (error.response) {
+      // Server responded with error
+      const { status, data } = error.response;
+      
+      if (status === 400) {
+        userMessage = data.error || 'Bad request. Customer may have existing records.';
+        
+        if (data.error?.includes('records')) {
+          userMessage = `Cannot delete: ${data.error}\n\nGo to Record Management to delete the records first.`;
+        }
+        
+      } else if (status === 404) {
+        userMessage = 'Customer not found. It may have been already deleted.';
+        notificationType = 'warning';
+        
+        // Remove from state anyway
+        setCustomers(prev => prev.filter(c => c.id !== id));
+        
+      } else if (status === 500) {
+        userMessage = 'Server error. Please try again later.';
+      } else {
+        userMessage = data.error || `Error ${status}: ${data.message || 'Unknown error'}`;
+      }
+      
+      console.log('Error response:', { status, data });
+      
+    } else if (error.request) {
+      // No response received
+      userMessage = 'Cannot connect to server. Please check if the backend is running on port 5000.';
+      
+    } else {
+      // Request setup error
+      userMessage = `Request error: ${error.message}`;
+    }
+    
+    showNotification('Error', userMessage, notificationType);
+    
+  } finally {
+    console.groupEnd();
+  }
+};
+
 
   const getFilteredCustomers = () => {
     if (!customerSearch.trim()) return customers;
@@ -1324,128 +1449,152 @@ function Dashboard() {
     );
   }
 
-  return (
-    <div className={`dashboard-container ${sidebarOpen ? 'sidebar-open' : 'sidebar-closed'}`}>
-      
-      {notification.show && (
-        <div className={`notification ${notification.type}`}>
-          <div className="notification-content">
-            <div className="notification-icon">
-              {notification.type === 'success' && '✓'}
-              {notification.type === 'error' && '✗'}
-              {notification.type === 'info' && 'ℹ'}
-            </div>
-            <div className="notification-details">
-              <h4>{notification.title}</h4>
-              <p>{notification.message}</p>
-            </div>
-            <button className="notification-close" onClick={closeNotification}>
-              <FaTimes />
-            </button>
+// Add this import at the top with other imports
+
+
+// Add this MobileHeader component right after imports but before Dashboard function
+
+return (
+  <div className={`dashboard-container ${sidebarOpen ? 'sidebar-open' : 'sidebar-closed'}`}>
+    
+    {/* Mobile Header */}
+   
+    
+    {/* Overlay for mobile sidebar */}
+  
+    
+    {/* Notification */}
+    {notification.show && (
+      <div className={`notification ${notification.type}`}>
+        <div className="notification-content">
+          <div className="notification-icon">
+            {notification.type === 'success' && '✓'}
+            {notification.type === 'error' && '✗'}
+            {notification.type === 'info' && 'ℹ'}
           </div>
+          <div className="notification-details">
+            <h4>{notification.title}</h4>
+            <p>{notification.message}</p>
+          </div>
+          <button className="notification-close" onClick={closeNotification}>
+            <FaTimes />
+          </button>
         </div>
-      )}
+      </div>
+    )}
 
-      <Sidebar
-        sidebarOpen={sidebarOpen}
-        mobileSidebarOpen={mobileSidebarOpen}
-        user={user}
-        activeTab={activeTab}
-        setActiveTab={setActiveTab}
-        setMobileSidebarOpen={setMobileSidebarOpen}
-        handleLogout={handleLogout}
-      />
+    {/* Sidebar */}
+    <Sidebar
+      sidebarOpen={sidebarOpen}
+      mobileSidebarOpen={mobileSidebarOpen}
+      user={user}
+      activeTab={activeTab}
+      setActiveTab={setActiveTab}
+      setMobileSidebarOpen={setMobileSidebarOpen}
+      handleLogout={handleLogout}
+    />
 
-      <main className={`main-content ${sidebarOpen ? 'with-sidebar' : 'full-width'}`}>
-        <div className="content-wrapper">
-          {activeTab === 'dashboard' && (
-            <DashboardContent
-              user={user}
-              stats={stats}
-              dailyRecords={dailyRecords}
-              setActiveTab={setActiveTab}
-            />
-          )}
+    {/* Main Content */}
+    <main className={`main-content ${sidebarOpen ? 'with-sidebar' : 'full-width'}`}>
+      {/* Menu Toggle Button for Desktop */}
+      <button 
+        className="menu-toggle-btn"
+        onClick={() => setSidebarOpen(!sidebarOpen)}
+      >
+        {sidebarOpen ? '◀' : '▶'}
+      </button>
+      
+      <div className="content-wrapper">
+        {activeTab === 'dashboard' && (
+          <DashboardContent
+            user={user}
+            stats={stats}
+            dailyRecords={dailyRecords}
+            setActiveTab={setActiveTab}
+          />
+        )}
 
-          {activeTab === 'manage-services' && (
-            <ManageServicesContent
-              hairServices={hairServices}
-              skinServices={skinServices}
-              tattooServices={tattooServices}
-              piercingServices={piercingServices}
-              serviceForm={serviceForm}
-              setServiceForm={setServiceForm}
-              activeServiceTab={activeServiceTab}
-              setActiveServiceTab={setActiveServiceTab}
-              handleServiceSubmit={handleServiceSubmit}
-              editService={editService} 
-              deleteService={deleteService}
-              downloadServicesExcel={downloadServicesExcel}
-              downloadServicesPDF={downloadServicesPDF}
-              downloadServicesCSV={downloadServicesCSV}
-            />
-          )}
+        {activeTab === 'manage-services' && (
+          <ManageServicesContent
+            hairServices={hairServices}
+            skinServices={skinServices}
+            tattooServices={tattooServices}
+            piercingServices={piercingServices}
+            serviceForm={serviceForm}
+            setServiceForm={setServiceForm}
+            activeServiceTab={activeServiceTab}
+            setActiveServiceTab={setActiveServiceTab}
+            handleServiceSubmit={handleServiceSubmit}
+            editService={editService} 
+            deleteService={deleteService}
+            downloadServicesExcel={downloadServicesExcel}
+            downloadServicesPDF={downloadServicesPDF}
+            downloadServicesCSV={downloadServicesCSV}
+          />
+        )}
 
-          {activeTab === 'staff-management' && (
-            <StaffManagementContent
-              staff={staff}
-              updateEmployee={updateEmployee}
-              updateEmployeePassword={updateEmployeePassword}
-              deleteEmployee={deleteEmployee}
-            />
-          )}
+        {activeTab === 'staff-management' && (
+          <StaffManagementContent
+            staff={staff}
+            updateEmployee={updateEmployee}
+            updateEmployeePassword={updateEmployeePassword}
+            deleteEmployee={deleteEmployee}
+          />
+        )}
 
-          {activeTab === 'customer-management' && (
-            <CustomerManagementContent
-              customers={customers}
-              customerForm={customerForm}
-              setCustomerForm={setCustomerForm}
-              handleCustomerSubmit={handleCustomerSubmit}
-              editCustomer={editCustomer}
-              deleteCustomer={deleteCustomer}
-              customerSearch={customerSearch}
-              setCustomerSearch={setCustomerSearch}
-              getFilteredCustomers={getFilteredCustomers}
-              generateReport={generateReport}
-              formatPhoneNumber={formatPhoneNumber}
-            />
-          )}
+        {activeTab === 'customer-management' && (
+          <CustomerManagementContent
+            customers={customers}
+            customerForm={customerForm}
+            setCustomerForm={setCustomerForm}
+            handleCustomerSubmit={handleCustomerSubmit}
+            editCustomer={editCustomer}
+            deleteCustomer={deleteCustomer}
+            customerSearch={customerSearch}
+            setCustomerSearch={setCustomerSearch}
+            getFilteredCustomers={getFilteredCustomers}
+            generateReport={generateReport}
+            formatPhoneNumber={formatPhoneNumber}
+          />
+        )}
 
-          {activeTab === 'record-management' && (
-            <RecordManagementContent
-              customers={customers}
-              hairServices={hairServices}
-              skinServices={skinServices}
-              tattooServices={tattooServices}
-              piercingServices={piercingServices}
-              dailyRecords={dailyRecords}
-              recordForm={recordForm}
-              setRecordForm={setRecordForm}
-              handleRecordSubmit={handleRecordSubmit}
-              deleteRecord={deleteRecord}
-              deleteAllRecords={deleteAllRecords}
-              getAllServices={getAllServices}
-              handleServiceSelect={handleServiceSelect}
-              handleCustomerSelect={handleCustomerSelect}
-              dateFilter={dateFilter}
-              setDateFilter={setDateFilter}
-              dateRange={dateRange}
-              setDateRange={setDateRange}
-              recordSearch={recordSearch}
-              setRecordSearch={setRecordSearch}
-              getFilteredRecords={getFilteredRecords}
-              calculateIncome={calculateIncome}
-              exportToCSV={exportToCSV}
-              exportToExcel={exportToExcel}
-              exportToPDF={exportToPDF}
-              showNotification={showNotification}
-              formatDateToDDMMYYYY={formatDateToDDMMYYYY}
-            />
-          )}
-        </div>
-      </main>
-    </div>
-  );
+        {activeTab === 'record-management' && (
+          <RecordManagementContent
+            customers={customers}
+            hairServices={hairServices}
+            skinServices={skinServices}
+            tattooServices={tattooServices}
+            piercingServices={piercingServices}
+            dailyRecords={dailyRecords}
+            recordForm={recordForm}
+            setRecordForm={setRecordForm}
+            handleRecordSubmit={handleRecordSubmit}
+            deleteRecord={deleteRecord}
+            deleteAllRecords={deleteAllRecords}
+            getAllServices={getAllServices}
+            handleServiceSelect={handleServiceSelect}
+            handleCustomerSelect={handleCustomerSelect}
+            dateFilter={dateFilter}
+            setDateFilter={setDateFilter}
+            dateRange={dateRange}
+            setDateRange={setDateRange}
+            recordSearch={recordSearch}
+            setRecordSearch={setRecordSearch}
+            getFilteredRecords={getFilteredRecords}
+            calculateIncome={calculateIncome}
+            exportToCSV={exportToCSV}
+            exportToExcel={exportToExcel}
+            exportToPDF={exportToPDF}
+            showNotification={showNotification}
+            formatDateToDDMMYYYY={formatDateToDDMMYYYY}
+          />
+        )}
+      </div>
+    </main>
+  </div>
+);
+        
+  
 }
 
 export default Dashboard;

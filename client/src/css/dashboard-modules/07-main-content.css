@@ -53,3 +53,46 @@
   font-size: 17px;
   font-weight: 500;
 }
+
+
+/* =========================
+   MOBILE RESPONSIVE
+========================= */
+@media (max-width: 767px) {
+  .main-content.with-sidebar,
+  .main-content.full-width {
+    margin-left: 0 !important;
+    width: 100% !important;
+    padding-top: 70px; /* Height of mobile header */
+    padding-left: 15px !important;
+    padding-right: 15px !important;
+  }
+  
+  .content-wrapper {
+    padding: 15px !important;
+  }
+}
+
+@media (min-width: 768px) {
+  .main-content.with-sidebar {
+    margin-left: 280px;
+    width: calc(100% - 280px);
+    padding-top: 0;
+  }
+  
+  .main-content.full-width {
+    margin-left: 0;
+    width: 100%;
+    padding-left: 80px;
+  }
+}
+/* Push footer to bottom ONLY */
+.dashboard-content {
+  min-height: calc(100vh - 80px); /* adjust if header height differs */
+  display: flex;
+  flex-direction: column;
+}
+
+.dashboard-footer {
+  margin-top: auto; /* THIS pushes footer down */
+}

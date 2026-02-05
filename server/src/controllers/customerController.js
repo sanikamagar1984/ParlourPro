@@ -2,7 +2,7 @@
 const { query } = require('../config/authdb');
 
 // =======================
-// Get all customers (UPDATED - removed total_spent and total_visits)
+// Get all customers
 // =======================
 exports.getAllCustomers = async (req, res) => {
   try {
@@ -191,50 +191,101 @@ exports.updateCustomer = async (req, res) => {
 };
 
 // =======================
-// Delete customer
+// Delete customer - SIMPLE WORKING VERSION
 // =======================
 exports.deleteCustomer = async (req, res) => {
+  console.log('🔴 DELETE /api/customers called for ID:', req.params.id);
+  
   try {
     const { id } = req.params;
-
-    // Check if customer exists
-    const checkResult = await query(
-      'SELECT id FROM customers WHERE id = $1',
-      [id]
+    
+    // Validate ID
+    if (!id || isNaN(parseInt(id))) {
+      console.log('Invalid ID format');
+      return res.status(400).json({
+        success: false,
+        error: 'Invalid customer ID'
+      });
+    }
+    
+    const customerId = parseInt(id);
+    
+    // 1. Check if customer exists
+    console.log('Checking if customer exists...');
+    const customerCheck = await query(
+      'SELECT id, name FROM customers WHERE id = $1',
+      [customerId]
     );
-
-    if (checkResult.rows.length === 0) {
+    
+    if (customerCheck.rows.length === 0) {
+      console.log('Customer not found');
       return res.status(404).json({
         success: false,
         error: 'Customer not found'
       });
     }
-
-    // Check if customer has records
+    
+    const customerName = customerCheck.rows[0].name;
+    console.log(`Found customer: ${customerName}`);
+    
+    // 2. Check for service records
+    console.log('Checking for service records...');
     const recordsCheck = await query(
       'SELECT COUNT(*) as count FROM daily_records WHERE customer_id = $1',
-      [id]
+      [customerId]
     );
-
-    if (parseInt(recordsCheck.rows[0].count) > 0) {
+    
+    const recordCount = parseInt(recordsCheck.rows[0].count);
+    console.log(`Record count: ${recordCount}`);
+    
+    if (recordCount > 0) {
+      console.log(`Cannot delete - has ${recordCount} records`);
       return res.status(400).json({
         success: false,
-        error: 'Cannot delete customer with service records. Consider archiving instead.'
+        error: `Cannot delete customer "${customerName}" because they have ${recordCount} service record(s). Please delete the records first.`,
+        recordCount: recordCount
       });
     }
-
-    // Delete the customer
-    await query('DELETE FROM customers WHERE id = $1', [id]);
-
+    
+    // 3. Delete the customer
+    console.log('Deleting customer...');
+    const deleteResult = await query(
+      'DELETE FROM customers WHERE id = $1 RETURNING id, name',
+      [customerId]
+    );
+    
+    console.log(`✅ Successfully deleted: ${deleteResult.rows[0].name}`);
+    
     res.json({
       success: true,
-      message: 'Customer deleted successfully'
+      message: `Customer "${customerName}" deleted successfully`,
+      deletedCustomer: deleteResult.rows[0]
     });
+    
   } catch (error) {
-    console.error('❌ Delete customer error:', error.message);
+    console.error('❌ Delete customer error:', error);
+    console.error('Error code:', error.code);
+    console.error('Error message:', error.message);
+    
+    // Handle specific database errors
+    if (error.code === '23503') { // Foreign key violation
+      return res.status(400).json({
+        success: false,
+        error: 'Cannot delete customer because they have related records in other tables.'
+      });
+    }
+    
+    if (error.code === '23505') { // Unique constraint
+      return res.status(400).json({
+        success: false,
+        error: 'Database constraint error'
+      });
+    }
+    
     res.status(500).json({
       success: false,
-      error: 'Server error'
+      error: 'Server error while deleting customer',
+      details: process.env.NODE_ENV === 'development' ? error.message : undefined
     });
   }
 };

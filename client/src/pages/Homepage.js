@@ -49,9 +49,9 @@ function HomePage() {
   ];
 
   const testimonials = [
-    { name: "Sarah Johnson", text: "Best salon experience ever!", rating: 5 },
-    { name: "Priya Sharma", text: "My wedding makeup was perfect!", rating: 5 },
-    { name: "Lisa Wang", text: "Professional service and amazing results.", rating: 5 },
+    { name: "Mrunmayee shivalkar", text: "Best salon experience ever!", rating: 5 },
+    { name: "Jidnyaasa kurtradkar", text: "Professional service and amazing results", rating: 5 },
+    { name: "Smita sawant", text: "Professional service and amazing results.", rating: 5 },
   ];
 
   const scrollToSection = (sectionId) => {
@@ -217,6 +217,9 @@ function HomePage() {
                 </a>
               </div>
               <p className="copyright">© 2026 Tressence by Simi. All rights reserved.</p>
+              <p className="developer-credit">
+    Created & Maintained by <span>Shravani Mandve</span>
+  </p>
             </div>
           </div>
         </div>

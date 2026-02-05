@@ -357,3 +357,16 @@ input {
 input:focus {
   border-color: #b45309; /* brown theme */
 }
+/* ===== FOOTER DEVELOPER CREDIT FIX ===== */
+.footer-social .developer-credit {
+  font-size: 13px;
+  color: #aaa;
+  margin-top: 6px;
+  text-align: center;
+  letter-spacing: 0.4px;
+}
+
+.footer-social .developer-credit span {
+  color: #d2691e;
+  font-weight: 600;
+}

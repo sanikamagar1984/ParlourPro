@@ -68,3 +68,227 @@
 
 /* Utilities & Helpers */
 @import './dashboard-modules/22-utilities.css';
+
+/* =========================
+   MOBILE CONTENT RESPONSIVE
+========================= */
+
+@media (max-width: 767px) {
+  /* Fix for all content sections */
+  .content-wrapper > div {
+    padding: 0;
+    margin: 0;
+  }
+  
+  /* Welcome Section */
+  .welcome-section {
+    padding: 25px 20px !important;
+    margin-bottom: 25px !important;
+  }
+  
+  .welcome-section h1 {
+    font-size: 24px !important;
+    line-height: 1.3 !important;
+  }
+  
+  .welcome-section p {
+    font-size: 16px !important;
+  }
+  
+  /* Stats Grid */
+  .stats-grid {
+    grid-template-columns: 1fr !important;
+    gap: 15px !important;
+    margin-bottom: 25px !important;
+  }
+  
+  .stat-card {
+    padding: 20px !important;
+  }
+  
+  .stat-value {
+    font-size: 32px !important;
+  }
+  
+  .stat-icon {
+    width: 60px !important;
+    height: 60px !important;
+    font-size: 24px !important;
+  }
+  
+  /* Quick Actions */
+  .quick-actions {
+    padding: 20px !important;
+  }
+  
+  .quick-actions h2 {
+    font-size: 22px !important;
+  }
+  
+  .action-buttons {
+    grid-template-columns: 1fr !important;
+    gap: 12px !important;
+  }
+  
+  .action-btn {
+    padding: 20px 15px !important;
+    font-size: 15px !important;
+  }
+  
+  /* Forms */
+  .service-form-section,
+  .staff-form-section,
+  .customer-form-section,
+  .record-form-section,
+  .record-form-card {
+    padding: 20px 15px !important;
+  }
+  
+  .form-row,
+  .form-grid {
+    grid-template-columns: 1fr !important;
+    gap: 15px !important;
+  }
+  
+  .form-group input,
+  .form-group select,
+  .form-group textarea {
+    padding: 12px 15px !important;
+    font-size: 14px !important;
+  }
+  
+  /* Tables */
+  .table-container,
+  .records-table-container {
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+  }
+  
+  .data-table,
+  .records-table {
+    min-width: 800px !important; /* Allow horizontal scroll */
+  }
+  
+  .data-table th,
+  .data-table td,
+  .records-table th,
+  .records-table td {
+    padding: 10px 12px !important;
+    font-size: 13px !important;
+  }
+  
+  /* Service Cards */
+  .services-grid {
+    grid-template-columns: 1fr !important;
+  }
+  
+  .service-card {
+    padding: 20px !important;
+  }
+  
+  /* Customer Cards */
+  .customers-grid {
+    grid-template-columns: 1fr !important;
+  }
+  
+  .customer-card {
+    padding: 20px !important;
+  }
+  
+  /* Filter Section */
+  .filter-section {
+    padding: 20px 15px !important;
+  }
+  
+  .filter-controls {
+    flex-direction: column !important;
+    align-items: stretch !important;
+  }
+  
+  .search-bar,
+  .search-box {
+    min-width: 100% !important;
+    width: 100% !important;
+  }
+  
+  /* Buttons */
+  .btn-primary,
+  .btn-secondary {
+    padding: 14px 20px !important;
+    font-size: 14px !important;
+    width: 100% !important;
+    justify-content: center !important;
+  }
+  
+  .btn-edit,
+  .btn-delete,
+  .btn-key {
+    padding: 8px 12px !important;
+    font-size: 12px !important;
+  }
+  
+  /* Export buttons */
+  .export-options,
+  .export-buttons {
+    flex-wrap: wrap !important;
+    gap: 8px !important;
+  }
+  
+  .export-options button,
+  .export-btn {
+    flex: 1 !important;
+    min-width: 100px !important;
+    font-size: 12px !important;
+    padding: 8px 12px !important;
+  }
+  
+  /* Section Headers */
+  .section-header h1 {
+    font-size: 24px !important;
+  }
+  
+  .section-header p {
+    font-size: 14px !important;
+  }
+  
+  /* Adjust content wrapper padding */
+  .content-wrapper {
+    padding: 10px !important;
+  }
+  
+  /* Text adjustments */
+  h1, h2, h3 {
+    font-size: 20px !important;
+  }
+  
+  p, span, li {
+    font-size: 14px !important;
+  }
+  
+  /* Make text more readable */
+  body {
+    font-size: 14px !important;
+    line-height: 1.4 !important;
+  }
+}
+
+/* For very small screens (under 400px) */
+@media (max-width: 400px) {
+  .content-wrapper {
+    padding: 8px !important;
+  }
+  
+  .welcome-section h1 {
+    font-size: 22px !important;
+  }
+  
+  .stat-value {
+    font-size: 28px !important;
+  }
+  
+  .action-btn {
+    padding: 18px 12px !important;
+    font-size: 14px !important;
+  }
+}
+
