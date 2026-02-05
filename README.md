@@ -94,7 +94,7 @@ Full-Stack Developer
 
 ---
 
-## 📞 Client Use Case
+## Client Use Case
 
 ParlourPro is actively used to:
 - Track daily salon income
