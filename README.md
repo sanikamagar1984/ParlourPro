@@ -1,9 +1,10 @@
+# 💇 ParlourPro
+
 ![ParlourPro Banner](https://raw.githubusercontent.com/shavu05/ParlourPro/main/assets/banner.png)
-# ParlourPro
 
-ParlourPro is a professional salon management system developed for a real beauty salon to streamline daily operations, manage customers, staff, services, and track business performance efficiently.
+ParlourPro is a professional **salon management system** developed for a real beauty salon to streamline daily operations, manage customers, staff, services, and track business performance efficiently.
 
-The application replaces manual record-keeping with a secure, digital solution that provides real-time insights into salon operations and revenue.
+The application replaces manual record-keeping with a secure, digital solution that provides **real-time insights** into salon operations and revenue.
 
 ---
 
@@ -80,8 +81,7 @@ The application replaces manual record-keeping with a secure, digital solution t
 ### Prerequisites
 - Node.js (v16 or above)
 - npm
--  npm run dev
-
+- npm run dev
 - PostgreSQL installed and running
 
 ---
