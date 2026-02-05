@@ -10,7 +10,7 @@ The application replaces manual record-keeping with a secure, digital solution t
 
 ### 🔐 Authentication & Security
 - Secure login system for Admin and Staff
-- JWT-based authentication
+- JWT-based authentication (stored in cookies)
 - Password hashing using bcrypt
 - Role-based access control
 
@@ -67,7 +67,6 @@ The application replaces manual record-keeping with a secure, digital solution t
 ---
 
 ## 🏗 System Architecture
-
 - RESTful API architecture
 - Separate frontend and backend
 - Secure cookie-based authentication
@@ -75,36 +74,18 @@ The application replaces manual record-keeping with a secure, digital solution t
 
 ---
 
-## 👩‍💻 Developed By
+## ▶️ How to Run the Project
 
-**Shravani Mandve**  
-Full-Stack Developer  
+### Prerequisites
+- Node.js (v16 or above)
+- npm
+-  npm run dev
 
-📍 Developed for a real salon client  
-📅 Year: 2025
-
----
-
-## 📈 Project Status
-
-- Admin Panel: ✅ Completed  
-- Staff Panel: ✅ Completed  
-- Client Reports: ✅ Completed  
-- Deployment: 🔜 Planned / In Progress
+- PostgreSQL installed and running
 
 ---
 
-## Client Use Case
-
-ParlourPro is actively used to:
-- Track daily salon income
-- Manage customer data securely
-- Generate professional reports
-- Reduce manual errors and save time
-
----
-
-## 📄 License
-
-This software is developed for a real client.  
-Unauthorized copying or redistribution is not permitted.
+### 1️⃣ Clone the Repository
+```bash
+git clone https://github.com/shavu05/ParlourPro.git
+cd ParlourPro
