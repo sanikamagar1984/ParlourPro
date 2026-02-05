@@ -1,6 +1,6 @@
 # 💇 ParlourPro
 
-![ParlourPro Banner](https://raw.githubusercontent.com/shavu05/ParlourPro/main/assets/banner.png)
+
 
 ParlourPro is a professional **salon management system** developed for a real beauty salon to streamline daily operations, manage customers, staff, services, and track business performance efficiently.
 
